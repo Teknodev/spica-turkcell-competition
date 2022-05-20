@@ -1,0 +1,155 @@
+_id: 605ca275e9960e002c2781a4
+title: Duel
+description: The duel between the users
+icon: offline_bolt
+primary: winner_of_current_question
+readOnly: false
+history: false
+properties:
+  user1:
+    type: relation
+    title: user1
+    description: First user in the duel
+    options:
+      position: bottom
+    relationType: onetoone
+    bucketId: 605c9480e9960e002c278191
+    dependent: false
+    primary: name
+  user2:
+    type: relation
+    title: user2
+    description: Second User of the duel
+    options:
+      position: bottom
+    relationType: onetoone
+    bucketId: 605c9480e9960e002c278191
+    dependent: false
+    primary: name
+  user1_ready:
+    type: boolean
+    title: user1_ready
+    description: Checker for the first user is ready or not
+    options:
+      position: bottom
+    default: false
+  user2_ready:
+    type: boolean
+    title: user2_ready
+    description: Checker for the first user is ready or not
+    options:
+      position: bottom
+    default: false
+  current_question:
+    type: relation
+    title: current_question
+    description: Current Question of the duel
+    options:
+      position: bottom
+    relationType: onetoone
+    bucketId: 605c9772e9960e002c278196
+    dependent: false
+    primary: question
+  current_answer:
+    type: string
+    title: current_answer
+    description: the answer of the current question
+    options:
+      position: bottom
+  options:
+    type: array
+    title: options
+    description: Description of the options input
+    options:
+      position: bottom
+    items:
+      type: string
+  user1_answer:
+    type: string
+    title: user1_answer
+    description: answer of the user 1
+    options:
+      position: bottom
+  user2_answer:
+    type: string
+    title: user2_answer
+    description: answer of the user2
+    options:
+      position: bottom
+  winner_of_current_question:
+    type: number
+    title: winner_of_current_question
+    description: |-
+      Winner of the current question.
+      0 -> Both didn't know
+      1 -> The first user knew
+      2 -> The second user knew
+      3 -> Both users knew
+    options:
+      position: bottom
+  last_question_date:
+    type: date
+    title: last_question_date
+    description: Time of the last question asked
+    options:
+      position: bottom
+  is_finished:
+    type: boolean
+    title: is_finished
+    description: Description of the is_finished input
+    options:
+      position: bottom
+    default: false
+  winner_score:
+    type: number
+    title: winner_score
+    description: Description of the winner_score input
+    options:
+      position: bottom
+  created_at:
+    type: date
+    title: created_at
+    description: Description of the created_at input
+    options:
+      position: bottom
+    default: :created_at
+  user1_is_free:
+    type: boolean
+    title: user1_is_free
+    description: Description of the user1_is_free input
+    options:
+      position: bottom
+    default: false
+  user2_is_free:
+    type: boolean
+    title: user2_is_free
+    description: Description of the user2_is_free input
+    options:
+      position: bottom
+    default: false
+  duel_type:
+    type: number
+    title: duel_type
+    description: Description of the duel_type input
+    options:
+      position: bottom
+    default: 0
+  user1_identity:
+    type: string
+    title: user1_identity
+    description: Description of the user1_identity input
+    options:
+      position: bottom
+  user2_identity:
+    type: string
+    title: user2_identity
+    description: Description of the user2_identity input
+    options:
+      position: bottom
+acl:
+  write: true == true
+  read: true == true
+required:
+  - user1
+  - user2
+order: 9

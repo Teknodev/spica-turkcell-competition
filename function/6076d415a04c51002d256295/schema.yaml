@@ -1,0 +1,22 @@
+_id: 6076d415a04c51002d256295
+name: 💻 Import Excel
+description: Import data as xls format
+language: javascript
+timeout: 51.4
+triggers:
+  importQuestions:
+    active: false
+    type: bucket
+    options:
+      type: INSERT
+      bucket: 6076d414a04c51002d256292
+  deleteAllOptions:
+    options:
+      method: Get
+      path: /deleteAllOptions
+      preflight: true
+    type: http
+    active: false
+env:
+  AUTH_APIKEY: "{AUTH_APIKEY}"
+memoryLimit: 100

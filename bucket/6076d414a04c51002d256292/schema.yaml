@@ -1,0 +1,29 @@
+_id: 6076d414a04c51002d256292
+title: Importer - Templates
+description: Import data to buckets
+acl:
+  write: true==true
+  read: true==true
+properties:
+  name:
+    type: string
+    description: Name of your import template
+    options:
+      position: left
+    title: name
+  bucket_id:
+    type: string
+    description: Define of which bucket
+    options:
+      position: right
+    title: bucket_id
+  file:
+    type: storage
+    description: Import file
+    options:
+      position: bottom
+    title: file
+primary: file
+icon: outbond
+order: 3
+history: false

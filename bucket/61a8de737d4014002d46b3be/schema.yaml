@@ -1,0 +1,30 @@
+_id: 61a8de737d4014002d46b3be
+title: Provisioning Logs
+description: Describe your new bucket
+icon: view_stream
+primary: msisdn
+readOnly: false
+history: false
+properties:
+  msisdn:
+    type: string
+    title: msisdn
+    description: Description of the msisdn input
+    options:
+      position: bottom
+  transaction_id:
+    type: string
+    title: transaction_id
+    description: Description of the transaction_id input
+    options:
+      position: bottom
+  date:
+    type: date
+    title: date
+    description: Description of the date input
+    options:
+      position: bottom
+acl:
+  write: true==true
+  read: true==true
+order: 32

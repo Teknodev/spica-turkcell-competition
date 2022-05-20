@@ -1,0 +1,41 @@
+_id: 605c98e2e9960e002c27819a
+title: Options
+description: The answer of the questions
+icon: question_answer
+primary: option
+readOnly: false
+history: false
+properties:
+  question:
+    type: relation
+    title: question
+    description: question of the answer
+    options:
+      position: bottom
+    relationType: onetoone
+    bucketId: 605c9772e9960e002c278196
+    dependent: false
+    primary: question
+  is_right:
+    type: boolean
+    title: is_right
+    description: show the answer is true OR not
+    options:
+      position: bottom
+    default: false
+  option:
+    type: string
+    title: option
+    description: Text of the option
+    options:
+      position: bottom
+acl:
+  write: |-
+    auth.attributes.role == "admin" ||
+    auth._id == "60a431c7a334b8002d50775e" ||
+    auth.key == "e5wl18kmw287kr"
+  read: true==true
+required:
+  - question
+  - option
+order: 8

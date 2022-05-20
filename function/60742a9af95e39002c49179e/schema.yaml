@@ -1,0 +1,29 @@
+_id: 60742a9af95e39002c49179e
+name: 🏆 Check Finished Duels
+description: This function gets every finished duel and left duels. Then close
+  the duel and log everything.
+language: javascript
+timeout: 51.4
+triggers:
+  checkFinishedDuels:
+    options:
+      timezone: Europe/Istanbul
+      frequency: "* * * * *"
+    type: schedule
+    active: true
+  availablePlayForDeletedMatch:
+    options:
+      method: Get
+      path: /availablePlayForDeletedMatch
+      preflight: true
+    type: http
+    active: true
+env:
+  SECRET_API_KEY: "{SECRET_API_KEY}"
+  DUEL_ANSWERS_BUCKET_ID: "{DUEL_ANSWERS_BUCKET_ID}"
+  DUEL_BUCKET_ID: "{DUEL_BUCKET_ID}"
+  PAST_DUELS_BUCKET_ID: "{PAST_DUELS_BUCKET_ID}"
+  USER_BUCKET_ID: "{USER_BUCKET_ID}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+  DELETED_MATCHES_BUCKET: "{DELETED_MATCHES_BUCKET}"
+memoryLimit: 100

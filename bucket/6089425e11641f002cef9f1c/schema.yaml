@@ -1,0 +1,42 @@
+_id: 6089425e11641f002cef9f1c
+title: Question Report
+description: Question Report
+icon: receipt
+primary: question_id
+readOnly: false
+history: false
+properties:
+  question_id:
+    type: string
+    title: question_id
+    description: Description of the question_id input
+    options:
+      position: bottom
+  question:
+    type: string
+    title: question
+    description: Description of the question input
+    options:
+      position: bottom
+  level:
+    type: number
+    title: level
+    description: Description of the level input
+    options:
+      position: bottom
+  correct_answer:
+    type: number
+    title: correct_answer
+    description: Description of the correct_answer input
+    options:
+      position: bottom
+  wrong_answer:
+    type: number
+    title: wrong_answer
+    description: Description of the wrong_answer input
+    options:
+      position: bottom
+acl:
+  write: true==true
+  read: true==true
+order: 18

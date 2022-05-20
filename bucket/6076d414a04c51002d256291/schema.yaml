@@ -1,0 +1,47 @@
+_id: 6076d414a04c51002d256291
+title: Exporter - Templates
+description: You can add export bucket as you want
+acl:
+  write: true==true
+  read: true==true
+properties:
+  title:
+    type: string
+    description: Title of your export template
+    options:
+      position: left
+    title: title
+  link:
+    type: richtext
+    description: Define of download link
+    options:
+      position: bottom
+    title: link
+  property_name:
+    type: string
+    title: property_name
+    description: The name of the property with the date type attribute
+    options:
+      position: right
+  from_date:
+    type: date
+    title: from_date
+    description: From date
+    options:
+      position: left
+  to_date:
+    type: date
+    title: to_date
+    description: End date
+    options:
+      position: right
+  auto:
+    type: boolean
+    description: Created by initialize function
+    options:
+      position: bottom
+    title: auto
+primary: title
+icon: outbond
+order: 2
+history: false

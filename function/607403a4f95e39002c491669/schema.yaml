@@ -1,0 +1,24 @@
+_id: 607403a4f95e39002c491669
+name: 🚀 AFKChecker
+description: This function checks the afk user and leave an empty answer as
+  users if there is no answer in 15 seconds.
+language: javascript
+timeout: 268
+triggers:
+  checkAFK:
+    options:
+      collection: bucket_605ca275e9960e002c2781a4
+      type: REPLACE
+    type: database
+    active: true
+    batch:
+      deadline: 240
+      limit: 9007199254740991
+env:
+  SECRET_API_KEY: "{SECRET_API_KEY}"
+  DUEL_ANSWERS_BUCKET_ID: "{DUEL_ANSWERS_BUCKET_ID}"
+  AFKCHECKER_API_KEY: "{AFKCHECKER_API_KEY}"
+  DUEL_ANSWER_ID: "{DUEL_ANSWER_ID}"
+  DUEL_BUCKET_ID: "{DUEL_BUCKET_ID}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+memoryLimit: 100

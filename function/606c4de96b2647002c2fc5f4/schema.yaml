@@ -1,0 +1,24 @@
+_id: 606c4de96b2647002c2fc5f4
+name: ✅ Next Question
+description: This function is going to change the question of the according to duel.
+language: javascript
+timeout: 63
+triggers:
+  nextQuestion:
+    options:
+      method: Post
+      path: /nextQuestion
+      preflight: true
+    type: http
+    active: true
+env:
+  DUEL_BUCKET_ID: "{DUEL_BUCKET_ID}"
+  SECRET_API_KEY: "{SECRET_API_KEY}"
+  USER_BUCKET_ID: "{USER_BUCKET_ID}"
+  CONFIGURATION_BUCKET_ID: "{CONFIGURATION_BUCKET_ID}"
+  DUEL_ANSWERS_BUCKET_ID: "{DUEL_ANSWERS_BUCKET_ID}"
+  QUESTION_BUCKET_ID: "{QUESTION_BUCKET_ID}"
+  OPTIONS_BUCKET_ID: "{OPTIONS_BUCKET_ID}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+  JWT_SECRET_KEY: "{JWT_SECRET_KEY}"
+memoryLimit: 100

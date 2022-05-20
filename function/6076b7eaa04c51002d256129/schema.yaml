@@ -1,0 +1,32 @@
+_id: 6076b7eaa04c51002d256129
+name: 🎮 User Rank Index
+description: Finds user rank with devkit/database
+language: javascript
+timeout: 63
+triggers:
+  getUserRank:
+    options:
+      method: Get
+      path: /userrank
+      preflight: true
+    type: http
+    active: true
+  getLeaderUsers:
+    options:
+      method: Get
+      path: /getLeaderUsers
+      preflight: true
+    type: http
+    active: true
+  usersAvailablePlayCount:
+    options:
+      method: Get
+      path: /usersAvailablePlayCount
+      preflight: true
+    type: http
+    active: false
+env:
+  SECRET_API_KEY: "{SECRET_API_KEY}"
+  USER_BUCKET_ID: "{USER_BUCKET_ID}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+memoryLimit: 100

@@ -1,0 +1,80 @@
+_id: 605ca983e9960e002c2781a9
+title: Duel Answers
+description: Describe your new bucket
+icon: bar_chart
+primary: user1_answer
+readOnly: false
+history: false
+properties:
+  duel:
+    type: relation
+    title: duel
+    description: The duel of the users
+    options:
+      position: bottom
+    relationType: onetoone
+    bucketId: 605ca275e9960e002c2781a4
+    dependent: false
+    primary: winner_of_current_question
+  question:
+    type: relation
+    title: question
+    description: Question of the duel
+    options:
+      position: bottom
+    relationType: onetoone
+    bucketId: 605c9772e9960e002c278196
+    dependent: false
+    primary: question
+  correct_answer:
+    type: string
+    title: correct_answer
+    description: The correct answer of the the duel question
+    options:
+      position: bottom
+  options:
+    type: array
+    title: options
+    description: Options of the question
+    options:
+      position: bottom
+    items:
+      title: option
+      type: string
+      description: one of the answers of the question
+  user1_answer:
+    type: string
+    title: user1_answer
+    description: The answer of the first user
+    options:
+      position: bottom
+    pattern: ""
+  user2_answer:
+    type: string
+    title: user2_answer
+    description: The answer of the second user
+    options:
+      position: bottom
+  user1_answer_time:
+    type: date
+    title: user1_answer_time
+    description: The answer time of the first user
+    options:
+      position: bottom
+  user2_answer_time:
+    type: date
+    title: user2_answer_time
+    description: The answer time of the second user
+    options:
+      position: bottom
+acl:
+  write: |-
+    auth.attributes.role == "admin" ||
+    auth._id == "60a431c7a334b8002d50775e" ||
+    auth.key == "e5wl18kmw287kr"
+  read: |-
+    auth.attributes.role == "admin" ||
+    auth._id == "60a431c7a334b8002d50775e" ||
+    auth.key == "e5wl18kmw287kr"
+required: []
+order: 10

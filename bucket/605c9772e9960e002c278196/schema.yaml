@@ -1,0 +1,42 @@
+_id: 605c9772e9960e002c278196
+title: Question
+description: Question of the duels
+icon: help_outline
+primary: question
+readOnly: false
+history: false
+properties:
+  question:
+    type: string
+    title: question
+    description: question's text
+    options:
+      position: bottom
+  level:
+    type: number
+    title: level
+    description: the difficulty level of the question
+    options:
+      position: bottom
+  category:
+    type: string
+    title: category
+    description: Description of the category input
+    options:
+      position: bottom
+  sub_category:
+    type: string
+    title: sub_category
+    description: Description of the sub_category input
+    options:
+      position: bottom
+acl:
+  write: |-
+    auth.attributes.role == "admin" ||
+    auth._id == "60a431c7a334b8002d50775e" ||
+    auth.key == "e5wl18kmw287kr"
+  read: true==true
+required:
+  - question
+  - level
+order: 7

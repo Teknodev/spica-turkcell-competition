@@ -1,0 +1,31 @@
+_id: 60630f1ce9960e002c2781b4
+name: 👑 Login & Register
+description: login and register operations
+language: javascript
+timeout: 84
+triggers:
+  register:
+    options:
+      method: Post
+      path: /register
+      preflight: true
+    type: http
+    active: true
+    batch:
+      deadline: 15
+      limit: 9007199254740991
+  login:
+    options:
+      method: Post
+      path: /login
+      preflight: true
+    type: http
+    active: true
+    batch:
+      deadline: 15
+      limit: 9007199254740991
+env:
+  SECRET_API_KEY: "{SECRET_API_KEY}"
+  USER_POLICY: "{USER_POLICY}"
+  USER_BUCKET_ID: "{USER_BUCKET_ID}"
+memoryLimit: 100

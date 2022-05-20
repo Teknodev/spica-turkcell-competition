@@ -1,0 +1,21 @@
+_id: 6065a2f2e9960e002c278351
+name: ⚔️ Matchmaker
+description: This function is working every 5 seconds to match users who are
+  looking for a new match.
+language: javascript
+timeout: 51.4
+triggers:
+  matchmaker:
+    options:
+      timezone: Europe/Istanbul
+      frequency: "* * * * *"
+    type: schedule
+    active: true
+env:
+  MATCHMAKING_BUCKET_ID: "{MATCHMAKING_BUCKET_ID}"
+  SECRET_API_KEY: "{SECRET_API_KEY}"
+  DUEL_BUCKET_ID: "{DUEL_BUCKET_ID}"
+  USER_BUCKET_ID: "{USER_BUCKET_ID}"
+  CONFIGURATION_BUCKET_ID: "{CONFIGURATION_BUCKET_ID}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+memoryLimit: 100

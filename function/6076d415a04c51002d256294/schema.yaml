@@ -1,0 +1,53 @@
+_id: 6076d415a04c51002d256294
+name: 💻 Export Excel
+description: Export data as xls or csv format
+language: javascript
+timeout: 123.2
+triggers:
+  initialize:
+    active: true
+    type: http
+    options:
+      method: Get
+      path: /initializeExportExcel
+      preflight: true
+  excelExport:
+    active: true
+    type: http
+    options:
+      method: Get
+      path: /excelExport
+      preflight: true
+  updateLink:
+    options:
+      bucket: 6076d414a04c51002d256291
+      type: UPDATE
+    type: bucket
+    active: true
+  checkTcellMsisdns:
+    options:
+      method: Get
+      path: /checkTcellMsisdns
+      preflight: true
+    type: http
+    active: false
+  exportConfrimationCodes:
+    options:
+      method: Get
+      path: /exportConfrimationCodes
+      preflight: true
+    type: http
+    active: true
+  exportConfrimationCodesDelete:
+    options:
+      method: Get
+      path: /exportConfrimationCodesDelete
+      preflight: true
+    type: http
+    active: true
+env:
+  AUTH_APIKEY: "{AUTH_APIKEY}"
+  BUCKET_EXPORT_TEMPLATES: "{BUCKET_EXPORT_TEMPLATES}"
+  FORMAT_TYPE: "{FORMAT_TYPE}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+memoryLimit: 100

@@ -1,0 +1,20 @@
+_id: 60f18733a6166a002d6f78d4
+name: Server Ready
+description: Server Ready
+language: javascript
+timeout: 83
+triggers:
+  getAllIndexes:
+    options:
+      method: Get
+      path: /getAllIndexes
+      preflight: true
+    type: http
+    active: true
+env:
+  PAST_MATCHES_BUCKET_ID: "{PAST_MATCHES_BUCKET_ID}"
+  REWARD_LOGS_BUCKET_ID: "{REWARD_LOGS_BUCKET_ID}"
+  CHARGE_LOGS_BUCKET_ID: "{CHARGE_LOGS_BUCKET_ID}"
+  USER_BUCKET_ID: "{USER_BUCKET_ID}"
+  CONFIRMATION_CODES_BUCKET_ID: "{CONFIRMATION_CODES_BUCKET_ID}"
+memoryLimit: 100

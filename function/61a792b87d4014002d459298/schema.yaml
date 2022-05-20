@@ -1,0 +1,24 @@
+_id: 61a792b87d4014002d459298
+name: Clone Server - Sender Side
+description: Clone and send your buckets and functions with dependencies and
+  environments to another server
+language: javascript
+timeout: 300
+triggers:
+  sender:
+    active: true
+    type: http
+    options:
+      method: Get
+      path: /sender
+      preflight: true
+  senderDashboard:
+    active: true
+    type: http
+    options:
+      method: Get
+      path: /senderDashboard
+      preflight: true
+env:
+  API_KEY: "{API_KEY}"
+  _IGNORE_: "{_IGNORE_}"
