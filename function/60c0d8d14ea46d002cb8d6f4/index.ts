@@ -733,6 +733,8 @@ async function chargeReport(reportType, date) {
     let chargeBody = "";
     let totalQuantity = 0;
     let totalPlayCount = 0;
+    let lastDate = "";
+
     chargeData.forEach((charge, index) => {
         let date = charge.date;
         totalQuantity += charge.quantity;
@@ -741,6 +743,19 @@ async function chargeReport(reportType, date) {
             let now = new Date();
             date = now.setDate(now.getDate() - 1);
         }
+
+        if (lastDate && lastDate != new Date(date).toDateString()) {
+            chargeBody += `
+                <tr>
+                    <td style="width: 10%;">---</td>
+                    <td style="width: 10%;">---</td>
+                    <td style="width: 10%;">---</td>
+                    <td style="width: 10%;">---</td>
+                    <td style="width: 10%;">---</td>
+                    <td style="width: 50%;">---</td>
+                </tr>`
+        }
+
         chargeBody += `<tr>
                     <td style="width: 10%;">${new Date(date).toLocaleDateString()}</td>
                     <td style="width: 10%;">${charge.charge_amount}</td>
@@ -750,17 +765,8 @@ async function chargeReport(reportType, date) {
                     <td style="width: 50%;">${charge.error}</td>
                     </tr>
                     `;
-        (index + 1) % 8 == 0
-            ? (chargeBody += `
-        <tr>
-            <td style="width: 10%;">---</td>
-            <td style="width: 10%;">---</td>
-            <td style="width: 10%;">---</td>
-            <td style="width: 10%;">---</td>
-            <td style="width: 10%;">---</td>
-            <td style="width: 50%;">---</td>
-        </tr>`)
-            : undefined;
+
+        lastDate = new Date(date).toDateString();
     });
 
     let chargeHtml = `
@@ -888,6 +894,8 @@ async function rewardReport(reportType, date) {
 
     let rewardBody = "";
     let total = 0;
+    let lastDate = "";
+
     rewardData.forEach((reward, index) => {
         let date = reward.date;
         if (defaultReportType == 2) {
@@ -895,12 +903,24 @@ async function rewardReport(reportType, date) {
             date = now.setDate(now.getDate() - 1);
         }
         total += reward.count;
+
+        if (lastDate && lastDate != new Date(date).toDateString()) {
+            rewardBody += `
+                <tr>
+                    <td style="width: 10%;">---</td>
+                    <td style="width: 10%;">---</td>
+                    <td style="width: 80%;">---</td>
+                </tr>`
+        }
+
         rewardBody += `<tr>
                     <td style="width: 10%;">${new Date(date).toLocaleDateString()}</td>
                     <td style="width: 10%;">${numberWithDot(reward.count)}</td>
                     <td style="width: 80%;">${reward.error_text}</td>
                     </tr>
                     `;
+
+        lastDate = new Date(date).toDateString();
     });
 
     let rewardHtml = `

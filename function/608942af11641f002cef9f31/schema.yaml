@@ -50,6 +50,13 @@ triggers:
       preflight: true
     type: http
     active: true
+  executeReportWeeklyMan:
+    options:
+      method: Get
+      path: /executeReportWeeklyMan
+      preflight: true
+    type: http
+    active: true
 env:
   PAST_MATCHES_BUCKET_ID: "{PAST_MATCHES_BUCKET_ID}"
   QUESTION_BUCKET_ID: "{QUESTION_BUCKET_ID}"

@@ -495,6 +495,8 @@ export async function dashboardUserRewards(req, res) {
             }
 
             if (msisdn) {
+                msisdn = formatMsisdnTo_90(msisdn);
+
                 let db = await database().catch(err => console.log("ERROR 15 ", err));
                 const rewardsCollection = db.collection(`bucket_${REWARD_LOGS_BUCKET_ID}`);
                 let dateFilter = {
@@ -503,7 +505,7 @@ export async function dashboardUserRewards(req, res) {
                 };
                 rewards = await rewardsCollection
                     .find({
-                        msisdn: { $regex: msisdn },
+                        msisdn: msisdn,
                         date: dateFilter
                     })
                     .sort({ _id: -1 })
@@ -639,6 +641,8 @@ export async function userDashboardCharges(req, res) {
             }
 
             if (msisdn) {
+                msisdn = formatMsisdnTo_90(msisdn);
+
                 let db = await database().catch(err => console.log("ERROR 20 ", err));
                 const chargesCollection = db.collection(`bucket_${CHARGE_LOGS_BUCKET_ID}`);
                 let dateFilter = {
@@ -647,7 +651,10 @@ export async function userDashboardCharges(req, res) {
                 };
 
                 charges = await chargesCollection
-                    .find({ msisdn: { $regex: msisdn }, date: dateFilter })
+                    .find({
+                        msisdn: msisdn,
+                        date: dateFilter
+                    })
                     .sort({ _id: -1 })
                     .toArray()
                     .catch(err => console.log("ERROR 21 ", err));
@@ -1410,6 +1417,8 @@ export async function dahsboardBuggedRewards(req, res) {
             msisdn = filter.msisdn;
 
             if (msisdn) {
+                msisdn = formatMsisdnTo_90(msisdn);
+
                 let db = await database().catch(err => console.log("ERROR 15 ", err));
 
                 const rewardsCollection = db.collection(`bucket_${BUGGED_REWARDS_BUCKET_ID}`);
@@ -1419,7 +1428,7 @@ export async function dahsboardBuggedRewards(req, res) {
                 };
                 rewards = await rewardsCollection
                     .find({
-                        msisdn: { $regex: msisdn },
+                        msisdn: msisdn,
                         date: dateFilter
                     })
                     .sort({ _id: -1 })
@@ -1675,7 +1684,7 @@ export async function dahsboardUserPoints(req, res) {
                     .catch(err => console.log("ERROR 16 ", err));
 
                 let totalPoint = 0;
-                
+
                 pastMatches.forEach((match) => {
                     let userOrder = 1;
                     if (match.user1 != userId) {
@@ -1737,4 +1746,14 @@ export async function dahsboardUserPoints(req, res) {
             message: "No auth token",
             error: "Unauthorized"
         });
+}
+
+function formatMsisdnTo_90(msisdn) {
+    if (msisdn.charAt(0) == '0') {
+        msisdn = `9${msisdn}`
+    } else if (msisdn.charAt(0) == '5') {
+        msisdn = `90${msisdn}`
+    }
+
+    return msisdn
 }

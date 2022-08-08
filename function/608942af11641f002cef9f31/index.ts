@@ -968,3 +968,46 @@ export async function matchChargeCountList(req, res) {
     res.headers.set("Content-Type", "application/octet-stream");
     return res.status(200).send(formattedString);
 }
+
+export async function executeReportDailyMan(req, res) {
+    // let date1 = new Date();
+    // let date2 = new Date();
+    // let dateFrom = date1.setHours(date1.getHours() - 34);
+    // let dateTo = date2.setHours(date2.getHours() - 10);
+
+    // await questionReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 1", err));
+    // await userReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 4", err));
+    // await playedMatchCount(0, dateFrom, dateTo).catch(err => console.log("ERROR: 49", err));
+    // await matchReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 2", err));
+    // await matchWinLoseCount(0, dateFrom, dateTo).catch(err => console.log("ERROR: 55", err));
+    // await chargeReportExport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 3", err));
+    // await retryReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
+    // await getFailedRewards(0, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
+
+    await reportExportSend("Günlük Rapor", 0).catch(err => console.log("ERROR: 5", err));
+
+    return res.status(200).send({message: 'ok'});
+}
+
+export async function executeReportWeeklyMan(req, res) {
+    // let date1 = new Date();
+    // let date2 = new Date();
+    // let dateFrom = date1.setHours(date1.getHours() - 178);
+    // let dateTo = date2.setHours(date2.getHours() - 10);
+
+    // await questionReport(1, dateFrom, dateTo).catch(err => console.log("ERROR: 57", err));
+    // await userReport(1, dateFrom, dateTo).catch(err => console.log("ERROR: 58", err));
+    // await playedMatchCount(1, dateFrom, dateTo).catch(err => console.log("ERROR: 59", err));
+    // await matchReport(1, dateFrom, dateTo).catch(err => console.log("ERROR: 60", err));
+    // await matchWinLoseCount(1, dateFrom, dateTo).catch(err => console.log("ERROR: 61", err));
+    // await chargeReportExport(1, dateFrom, dateTo).catch(err => console.log("ERROR: 62", err));
+    // await retryReport(1, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
+    // await getFailedRewards(1, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
+
+    await reportExportSend("Haftalık Toplam Rapor", 1).catch(err => console.log("ERROR: 63", err));
+    await reportExportSend("Haftalık Gün Bazlı Rapor", 11).catch(err =>
+        console.log("ERROR: 63", err)
+    );
+    
+    return res.status(200).send({ message: 'ok' });
+}
