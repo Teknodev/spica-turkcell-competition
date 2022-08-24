@@ -163,7 +163,13 @@ async function retryTcellIssues() {
         reward => !manuallyRewards.find(mr => mr.retry_id == reward._id.toString())
     );
     for (let reward of buggedRewards) {
-        let retryCount = await rewardsCollection.find({ match_id: reward.match_id }).toArray();
+        let retryCount = await rewardsCollection.find({
+            $and: [
+                { match_id: { $exists: true } },
+                { match_id: { $ne: '' } },
+                { match_id: reward.match_id }
+            ]
+        }).toArray();
         if (retryCount.length < 24) {
             await insertReward(
                 reward.msisdn.substring(2),
@@ -458,3 +464,57 @@ export async function detectMissingAvailablePlay() {
 //             .catch(err => console.log("ERROR 22", err));
 //     }
 // }
+
+export async function manualSetReward1(req, res) {
+    let db = await database().catch(err => console.log("ERROR 7 ", err));
+    const buggedRewardsCollection = db.collection(`bucket_${BUGGED_REWARDS_BUCKET_ID}`);
+    const manuallyRewardsCollection = db.collection(`bucket_${MANUALLY_REWARD_BUCKET_ID}`);
+    const errors = ["3581"]; // TCELL ERROR
+
+    let minDate = new Date("2022-08-15T21:00:04.000Z");
+    let maxDate = new Date("2022-08-16T13:00:04.000Z");
+
+    let buggedRewards = await buggedRewardsCollection
+        .find({
+            date: { $gte: minDate, $lt: maxDate },
+            error_id: { $in: errors }
+        })
+        // .skip(2000)
+        // .limit(200)
+        .toArray()
+        .catch(err => console.log("ERROR 9 ", err));
+
+    let buggedRewardsIds = Array.from(buggedRewards, x => x._id.toString());
+    const manuallyRewards = await manuallyRewardsCollection
+        .find({
+            process_completed: true,
+            retry_id: { $in: buggedRewardsIds }
+        })
+        .toArray()
+        .catch(err => console.log("ERROR 14:", err));
+
+    buggedRewards = buggedRewards.filter(
+        reward => !manuallyRewards.find(mr => mr.retry_id == reward._id.toString())
+    );
+
+    console.log("buggedRewards: ", buggedRewards.length)
+
+    for (let reward of buggedRewards) {
+        let retryCount = await buggedRewardsCollection.find({
+            $and: [
+                { match_id: { $exists: true } },
+                { match_id: { $ne: '' } },
+                { match_id: reward.match_id }
+            ]
+        }).toArray();
+        if (retryCount.length < 24) {
+            insertReward(
+                reward.msisdn.substring(2),
+                "daily_1",
+                reward._id
+            );
+        }
+    }
+
+    return res.status(200).send({ mesage: 'ok' });
+}

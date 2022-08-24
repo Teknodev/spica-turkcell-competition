@@ -7,26 +7,19 @@ triggers:
   executeReportDaily:
     options:
       timezone: Europe/Istanbul
-      frequency: 0 9 * * *
+      frequency: 0 7 * * *
     type: schedule
-    active: true
-  testReport:
-    options:
-      method: Get
-      path: /testReport
-      preflight: true
-    type: http
     active: true
   executeReportWeekly:
     options:
       timezone: Europe/Istanbul
-      frequency: 0 9 * * 1
+      frequency: 5 7 * * 1
     type: schedule
     active: true
   executeReportMonthly:
     options:
       timezone: Europe/Istanbul
-      frequency: 5 9 1 * *
+      frequency: 5 7 1 * *
     type: schedule
     active: true
   executeReportMonthlyMan:

@@ -27,10 +27,9 @@ const BUGGED_REWARD_BUCKET_ID = process.env.BUGGED_REWARD_BUCKET_ID;
 const DAILY_1GB_OFFER_ID = 451318;
 
 export async function executeReportDaily() {
-    let date1 = new Date();
-    let date2 = new Date();
-    let dateFrom = date1.setHours(date1.getHours() - 33);
-    let dateTo = date2.setHours(date2.getHours() - 9);
+    let date = new Date().setDate(new Date().getDate() - 1)
+    let dateFrom = new Date(date).setHours(0, 0, 0);
+    let dateTo = new Date(date).setHours(23, 59, 59);
 
     await questionReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 1", err));
     await userReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 4", err));
@@ -46,20 +45,6 @@ export async function executeReportDaily() {
     return true;
 }
 export async function executeReportWeekly() {
-    let date1 = new Date();
-    let date2 = new Date();
-    let dateFrom = date1.setHours(date1.getHours() - 177);
-    let dateTo = date2.setHours(date2.getHours() - 9);
-
-    await questionReport(1, dateFrom, dateTo).catch(err => console.log("ERROR: 57", err));
-    await userReport(1, dateFrom, dateTo).catch(err => console.log("ERROR: 58", err));
-    await playedMatchCount(1, dateFrom, dateTo).catch(err => console.log("ERROR: 59", err));
-    await matchReport(1, dateFrom, dateTo).catch(err => console.log("ERROR: 60", err));
-    await matchWinLoseCount(1, dateFrom, dateTo).catch(err => console.log("ERROR: 61", err));
-    await chargeReportExport(1, dateFrom, dateTo).catch(err => console.log("ERROR: 62", err));
-    await retryReport(1, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
-    await getFailedRewards(1, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
-
     await reportExportSend("Haftalık Toplam Rapor", 1).catch(err => console.log("ERROR: 63", err));
     await reportExportSend("Haftalık Gün Bazlı Rapor", 11).catch(err =>
         console.log("ERROR: 63", err)
@@ -821,107 +806,6 @@ export async function getFailedRewards(reportType, dateFrom, dateTo) {
     }
 
     return true
-}
-
-export async function testReport(reportType) {
-    let date = new Date();
-    date.setDate(date.getDate() - 1);
-    const db = await database();
-    const pastMatchesCollection = db.collection(`bucket_${PAST_MATCHES_BUCKET_ID}`);
-
-    /*let user1Paid = await pastMatchesCollection
-        .aggregate([
-            { $match: { end_time: { $gte: date }, user1_is_free: false } },
-            { $group: { _id: "$user1" } }
-        ])
-        .toArray();
-
-    let user2Paid = await pastMatchesCollection
-        .aggregate([
-            { $match: { end_time: { $gte: date }, player_type: 0, user2_is_free: false } },
-            { $group: { _id: "$user2" } }
-        ])
-        .toArray();
-
-    let user1Free = await pastMatchesCollection
-        .aggregate([
-            { $match: { end_time: { $gte: date }, user1_is_free: true } },
-            { $group: { _id: "$user1" } }
-        ])
-        .toArray();
-
-    let user2Free = await pastMatchesCollection
-        .aggregate([
-            { $match: { end_time: { $gte: date },  player_type: 0, user2_is_free: true } },
-            { $group: { _id: "$user2" } }
-        ])
-        .toArray();
-
-    */
-
-    /*
-    let paidMatchCount = await pastMatchesCollection
-        .aggregate([
-            {
-                $match: {
-                    player_type: 0,
-                    $or: [
-                        { user1_is_free: false, user2_is_free: true },
-                        { user1_is_free: true, user2_is_free: false }
-                    ]
-                }
-            }
-        ]).count();*/
-
-    /*user1Paid = user1Paid.map(el => el._id);
-    user2Paid = user2Paid.map(el => el._id);
-    user1Free = user1Free.map(el => el._id);
-    user2Free = user2Free.map(el => el._id);
-    let paid = [...new Set([...user1Paid, ...user2Paid])];
-    let free = [...new Set([...user1Free, ...user2Free])];
-    paid = paid.length;
-    free = free.length;
-    //let chargedPlayers =  user1P2P + user2P2P;
-    */
-
-    let freeWin = await pastMatchesCollection
-        .find({
-            $or: [
-                { end_time: { $gte: date }, user1_is_free: true, winner: 1 },
-                { end_time: { $gte: date }, user2_is_free: true, winner: 2, player_type: 0 }
-            ]
-        })
-        .count();
-
-    let freeLose = await pastMatchesCollection
-        .find({
-            $or: [{ end_time: { $gte: date }, user1_is_free: true, winner: 2, player_type: 0 }]
-        })
-        .count();
-
-    let paidWin = await pastMatchesCollection
-        .find({
-            $or: [
-                { end_time: { $gte: date }, user1_is_free: false, winner: 1 },
-                { end_time: { $gte: date }, user2_is_free: false, winner: 2, player_type: 0 }
-            ]
-        })
-        .count();
-
-    let paidLose = await pastMatchesCollection
-        .find({
-            $or: [{ end_time: { $gte: date }, user1_is_free: false, winner: 2, player_type: 0 }]
-        })
-        .count();
-
-    return {
-        freeWin: freeWin,
-        freeLose: freeWin + freeLose,
-        paidWin: paidWin,
-        paidLose: paidWin + paidLose
-    };
-
-    // return { paid, free };
 }
 
 export async function executeReportMonthlyMan() {

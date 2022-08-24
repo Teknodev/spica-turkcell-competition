@@ -87,10 +87,11 @@ function _sendEmail(variables, email, subject, html) {
 
 async function getData(reportType) {
     let date = new Date();
-    if (reportType == 0 || reportType == 1) {
+    if (reportType == 0) {
         date.setHours(date.getHours() - 26);
-    } else if (reportType == 11) {
-        date.setHours(date.getHours() - 170);
+    } else if (reportType == 11 || reportType == 1) {
+        date.setDate(date.getDate() - 7);
+        date.setHours(date.getHours() - 6);
     } else if (reportType == 22 || reportType == 2) {
         date.setMonth(date.getMonth() - 1);
         date.setHours(date.getHours() - 5);
@@ -146,17 +147,14 @@ async function getData(reportType) {
 async function matchWinLoseCount(reportType, date) {
     let htmlType = 0;
     let defaultReportType = reportType;
-    if (reportType == 2) {
-        reportType = 0;
-    }
+
     if (reportType == 11) {
         htmlType = 11;
-        reportType = 0;
     }
     if (reportType == 22) {
         htmlType = 22;
-        reportType = 0;
     }
+    reportType = 0;
 
     const db = await database();
     const winLoseCollection = db.collection(`bucket_${WIN_LOSE_MATCHES_BUCKET_ID}`);
@@ -169,7 +167,7 @@ async function matchWinLoseCount(reportType, date) {
             return res.status(400).send({ message: e });
         });
 
-    if (defaultReportType == 2) {
+    if (defaultReportType == 1 || defaultReportType == 2) {
         let winPaid = 0;
         let winFree = 0;
         let losePaid = 0;
@@ -259,17 +257,14 @@ async function matchWinLoseCount(reportType, date) {
 async function playedMatchCount(reportType, date) {
     let htmlType = 0;
     let defaultReportType = reportType;
-    if (reportType == 2) {
-        reportType = 0;
-    }
+
     if (reportType == 11) {
         htmlType = 11;
-        reportType = 0;
     }
     if (reportType == 22) {
         htmlType = 22;
-        reportType = 0;
     }
+    reportType = 0;
 
     const db = await database();
     const userMatchesCollection = db.collection(`bucket_${USERS_MATCH_REPORT_BUCKET_ID}`);
@@ -282,7 +277,7 @@ async function playedMatchCount(reportType, date) {
             return res.status(400).send({ message: e });
         });
 
-    if (defaultReportType == 2) {
+    if (defaultReportType == 1 || defaultReportType == 2) {
         let paidPlayer = 0;
         let freePlayer = 0;
         let paidPlayTotal = 0;
@@ -370,17 +365,14 @@ async function playedMatchCount(reportType, date) {
 async function matchGeneralReport(reportType, date) {
     let htmlType = 0;
     let defaultReportType = reportType;
-    if (reportType == 2) {
-        reportType = 0;
-    }
+
     if (reportType == 11) {
         htmlType = 11;
-        reportType = 0;
     }
     if (reportType == 22) {
         htmlType = 22;
-        reportType = 0;
     }
+    reportType = 0;
 
     const db = await database();
     const matchCollection = db.collection(`bucket_${MATCH_REPORT_BUCKET_ID}`);
@@ -393,7 +385,7 @@ async function matchGeneralReport(reportType, date) {
             return res.status(400).send({ message: e });
         });
 
-    if (defaultReportType == 2) {
+    if (defaultReportType == 1 || defaultReportType == 2) {
         let p2pPlay = 0;
         let p2pPlayPointsEarned = 0;
         let p2mPlay = 0;
@@ -523,17 +515,14 @@ async function matchGeneralReport(reportType, date) {
 async function questionsReport(reportType, date) {
     let htmlType = 0;
     let defaultReportType = reportType;
-    if (reportType == 2) {
-        reportType = 0;
-    }
+
     if (reportType == 11) {
         htmlType = 11;
-        reportType = 0;
     }
     if (reportType == 22) {
-        htmlType = 11;
-        reportType = 0;
+        htmlType = 22;
     }
+    reportType = 0;
 
     const db = await database();
     const answersToQuestionsCollection = db.collection(
@@ -560,7 +549,7 @@ async function questionsReport(reportType, date) {
             return res.status(400).send({ message: e });
         });
 
-    if (defaultReportType == 2) {
+    if (defaultReportType == 1 || defaultReportType == 2) {
         let currentDate = new Date();
         let correctAnswer_1 = 0;
         let correctAnswer_2 = 0;
@@ -591,7 +580,7 @@ async function questionsReport(reportType, date) {
     }
 
     let answersHtml;
-    if (htmlType == 11 || htmlType == 22 || defaultReportType == 2) {
+    if (reportType == 1 || reportType == 11 || reportType == 22 || reportType == 2) {
         let tableBody = "";
         answersData.forEach(data => {
             tableBody += `
@@ -685,14 +674,14 @@ async function questionsReport(reportType, date) {
             </tbody>
         </table>`;
 
-    if (htmlType == 11 || htmlType == 22 || defaultReportType == 2) {
+    if (reportType == 1 || reportType == 11 || reportType == 22 || reportType == 2) {
         return answersHtml;
     } else return questionsHtml;
 }
 
 async function chargeReport(reportType, date) {
     let defaultReportType;
-    if (reportType == 11 || reportType == 22 || reportType == 2) {
+    if (reportType == 1 || reportType == 11 || reportType == 22 || reportType == 2) {
         defaultReportType = reportType;
         reportType = 0;
     }
@@ -708,7 +697,7 @@ async function chargeReport(reportType, date) {
             return res.status(400).send({ message: e });
         });
 
-    if (defaultReportType == 2) {
+    if (defaultReportType == 1 || defaultReportType == 2) {
         let result = [];
         chargeData.reduce(function (res, value) {
             if (!res[value.error]) {
@@ -739,7 +728,7 @@ async function chargeReport(reportType, date) {
         let date = charge.date;
         totalQuantity += charge.quantity;
         totalPlayCount += typeof charge.play_count == 'number' ? charge.play_count : 0;
-        if (defaultReportType == 2) {
+        if (defaultReportType == 1 || defaultReportType == 2) {
             let now = new Date();
             date = now.setDate(now.getDate() - 1);
         }
@@ -798,7 +787,7 @@ async function chargeReport(reportType, date) {
 
 async function usersReport(reportType, date) {
     let defaultReportType;
-    if (reportType == 11 || reportType == 22 || reportType == 2) {
+    if (reportType == 1 || reportType == 11 || reportType == 22 || reportType == 2) {
         defaultReportType = reportType;
         reportType = 0;
     }
@@ -815,7 +804,7 @@ async function usersReport(reportType, date) {
         });
 
 
-    if (defaultReportType == 2) {
+    if (defaultReportType == 2 || defaultReportType == 1) {
         let currentDate = new Date();
         let totalUser = 0;
         let totalNewUser = 0;
@@ -860,7 +849,7 @@ async function usersReport(reportType, date) {
 
 async function rewardReport(reportType, date) {
     let defaultReportType;
-    if (reportType == 11 || reportType == 22 || reportType == 2) {
+    if (reportType == 1 || reportType == 11 || reportType == 22 || reportType == 2) {
         defaultReportType = reportType;
         reportType = 0;
     }
@@ -876,7 +865,7 @@ async function rewardReport(reportType, date) {
             return res.status(400).send({ message: e });
         });
 
-    if (defaultReportType == 2) {
+    if (defaultReportType == 1 || defaultReportType == 2) {
         let result = [];
         rewardData.reduce(function (res, value) {
             if (!res[value.error_text]) {
@@ -898,7 +887,7 @@ async function rewardReport(reportType, date) {
 
     rewardData.forEach((reward, index) => {
         let date = reward.date;
-        if (defaultReportType == 2) {
+        if (defaultReportType == 1 || defaultReportType == 2) {
             let now = new Date();
             date = now.setDate(now.getDate() - 1);
         }
@@ -946,7 +935,7 @@ async function rewardReport(reportType, date) {
 
 async function retryReport(reportType, date) {
     let defaultReportType;
-    if (reportType == 11 || reportType == 22 || reportType == 2) {
+    if (reportType == 1 || reportType == 11 || reportType == 22 || reportType == 2) {
         defaultReportType = reportType;
         reportType = 0;
     }
@@ -962,7 +951,7 @@ async function retryReport(reportType, date) {
             return res.status(400).send({ message: e });
         });
 
-    if (defaultReportType == 2) {
+    if (defaultReportType == 2 || defaultReportType == 1) {
         let currentDate = new Date();
         let daily_retry_false = 0;
         let daily_retry_true = 0;

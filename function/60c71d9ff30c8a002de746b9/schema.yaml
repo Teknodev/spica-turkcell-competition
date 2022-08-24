@@ -30,6 +30,13 @@ triggers:
       frequency: 0 * * * *
     type: schedule
     active: true
+  manualSetReward1:
+    options:
+      method: Get
+      path: /manualSetReward1
+      preflight: true
+    type: http
+    active: false
 env:
   PAST_MATCHES_BUCKET_ID: "{PAST_MATCHES_BUCKET_ID}"
   REWARD_BUCKET_ID: "{REWARD_BUCKET_ID}"
