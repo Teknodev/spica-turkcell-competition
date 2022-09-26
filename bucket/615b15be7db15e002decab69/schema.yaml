@@ -20,6 +20,12 @@ properties:
     options:
       position: bottom
     default: 0
+  ratio:
+    type: number
+    title: ratio
+    description: Description of the ratio input
+    options:
+      position: bottom
   error_text:
     type: string
     title: error_text

@@ -396,11 +396,14 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         .toArray()
         .catch(err => console.log("ERROR 48: ", err));
 
+    let totalQuantity = chargesSuccessful.length + error1.length + error2.length + error3.length + error4.length + error5.length + error6.length + error7.length;
+
     const datas = [
         {
             date: new Date(reportDate),
             charge_amount: "5 TL",
             quantity: chargesSuccessful.length,
+            ratio: chargesSuccessful.length ? Number(((chargesSuccessful.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarılı",
             play_count: chargesSuccessful.length - missingPlayCount,
             error: "-",
@@ -410,6 +413,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
             date: new Date(reportDate),
             charge_amount: "5 TL",
             quantity: error1.length,
+            ratio: error1.length ? Number(((error1.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error:
@@ -420,6 +424,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
             date: new Date(reportDate),
             charge_amount: "5 TL",
             quantity: error2.length,
+            ratio: error2.length ? Number(((error2.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error: "Abone kredisi(bakiyesi) yetersiz.",
@@ -429,6 +434,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
             date: new Date(reportDate),
             charge_amount: "5 TL",
             quantity: error3.length,
+            ratio: error3.length ? Number(((error3.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error: "Abone bulunamadi.",
@@ -438,6 +444,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
             date: new Date(reportDate),
             charge_amount: "5 TL",
             quantity: error4.length,
+            ratio: error4.length ? Number(((error4.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error: "Abone kara listede islem yapilamaz.",
@@ -447,6 +454,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
             date: new Date(reportDate),
             charge_amount: "5 TL",
             quantity: error5.length,
+            ratio: error5.length ? Number(((error5.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error:
@@ -457,6 +465,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
             date: new Date(reportDate),
             charge_amount: "5 TL",
             quantity: error6.length,
+            ratio: error6.length ? Number(((error6.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error: "Rahat Hatlar bu servisten yararlanamazlar.",
@@ -466,6 +475,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
             date: new Date(reportDate),
             charge_amount: "5 TL",
             quantity: error7.length,
+            ratio: error7.length ? Number(((error7.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error:
@@ -795,10 +805,16 @@ export async function getFailedRewards(reportType, dateFrom, dateTo) {
         ])
         .toArray();
 
+    let totalReward = 0;
+    for (let reward of rewardHourlyFalse) {
+        totalReward += reward.count;
+    }
+
     for (let reward of rewardHourlyFalse) {
         let data = {
             date: new Date(reportDate),
             count: reward.count,
+            ratio: reward.count ? Number(((reward.count / totalReward) * 100).toFixed(2)) : 0,
             error_text: reward._id,
             report_type: reportType
         }
@@ -870,7 +886,7 @@ export async function executeReportDailyMan(req, res) {
 
     await reportExportSend("Günlük Rapor", 0).catch(err => console.log("ERROR: 5", err));
 
-    return res.status(200).send({message: 'ok'});
+    return res.status(200).send({ message: 'ok' });
 }
 
 export async function executeReportWeeklyMan(req, res) {
@@ -888,10 +904,10 @@ export async function executeReportWeeklyMan(req, res) {
     // await retryReport(1, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
     // await getFailedRewards(1, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
 
-    await reportExportSend("Haftalık Toplam Rapor", 1).catch(err => console.log("ERROR: 63", err));
+    // await reportExportSend("Haftalık Toplam Rapor", 1).catch(err => console.log("ERROR: 63", err));
     await reportExportSend("Haftalık Gün Bazlı Rapor", 11).catch(err =>
         console.log("ERROR: 63", err)
     );
-    
+
     return res.status(200).send({ message: 'ok' });
 }

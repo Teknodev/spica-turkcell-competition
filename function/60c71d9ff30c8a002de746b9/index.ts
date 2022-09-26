@@ -19,10 +19,8 @@ export async function checkReward() {
     if (!db) {
         db = await database().catch(err => console.log("ERROR 7 ", err));
     }
-    await retryNonRewardedMatches().catch(err => console.log("ERROR 12", err));
-    //await retryNonRewardedMatches2Temp().catch(err => console.log("ERROR 15", err));
+    // await retryNonRewardedMatches().catch(err => console.log("ERROR 12", err));
     await retryTcellIssues().catch(err => console.log("ERROR 13", err));
-    // await fillUnnamedPlayers().catch(err => console.log("ERROR 14", err));
 }
 
 export async function retryNonRewardedMatches() {
@@ -171,7 +169,7 @@ async function retryTcellIssues() {
             ]
         }).toArray();
         if (retryCount.length < 24) {
-            await insertReward(
+            insertReward(
                 reward.msisdn.substring(2),
                 reward.offer_id == HOURLY_1GB_OFFER_ID ? "hourly_1" : "daily_1",
                 reward._id
@@ -195,23 +193,6 @@ async function insertReward(msisdn, rewardType, retry_id = "") {
 
     return true;
 }
-
-// async function fillUnnamedPlayers() {
-//     let usersCollection = db.collection(`bucket_605c9480e9960e002c278191`);
-//     let date = new Date();
-//     date.setMinutes(date.getMinutes() - 5);
-//     let users = await usersCollection
-//         .find({ $or: [{ name: { $exists: false } }, { name: null }], created_at: { $lt: date } })
-//         .toArray();
-//     for (let user of users) {
-//         await usersCollection
-//             .update(
-//                 { _id: ObjectId(user._id) },
-//                 { $set: { name: "Kullanıcı" + Math.round(Math.random() * 1000000) } }
-//             )
-//             .catch(e => console.log(e));
-//     }
-// }
 
 export async function detectUniqueCharges(req, res) {
     if (!db) {

@@ -99,28 +99,33 @@ async function getData(reportType) {
         return true;
     }
 
-    const usersHtml = await usersReport(reportType, date).catch(err =>
+    let dateFilter = {
+        $gte: new Date(date),
+        $lte: new Date()
+    }
+
+    const usersHtml = await usersReport(reportType, dateFilter).catch(err =>
         console.log("ERROR 27", err)
     );
-    const playedMatchHtml = await playedMatchCount(reportType, date).catch(err =>
+    const playedMatchHtml = await playedMatchCount(reportType, dateFilter).catch(err =>
         console.log("ERROR 23", err)
     );
-    const matchGeneralHtml = await matchGeneralReport(reportType, date).catch(err =>
+    const matchGeneralHtml = await matchGeneralReport(reportType, dateFilter).catch(err =>
         console.log("ERROR 24", err)
     );
-    const matchWinLoseHtml = await matchWinLoseCount(reportType, date).catch(err =>
+    const matchWinLoseHtml = await matchWinLoseCount(reportType, dateFilter).catch(err =>
         console.log("ERROR 22", err)
     );
-    const chargeHtml = await chargeReport(reportType, date).catch(err =>
+    const chargeHtml = await chargeReport(reportType, dateFilter).catch(err =>
         console.log("ERROR 26", err)
     );
-    const rewardHtml = await rewardReport(reportType, date).catch(err =>
+    const rewardHtml = await rewardReport(reportType, dateFilter).catch(err =>
         console.log("ERROR 25", err)
     );
-    const retryHtml = await retryReport(reportType, date).catch(err =>
+    const retryHtml = await retryReport(reportType, dateFilter).catch(err =>
         console.log("ERROR 26", err)
     );
-    const questionsHtml = await questionsReport(reportType, date).catch(err =>
+    const questionsHtml = await questionsReport(reportType, dateFilter).catch(err =>
         console.log("ERROR 25", err)
     );
 
@@ -144,7 +149,7 @@ async function getData(reportType) {
     return html;
 }
 
-async function matchWinLoseCount(reportType, date) {
+async function matchWinLoseCount(reportType, dateFilter) {
     let htmlType = 0;
     let defaultReportType = reportType;
 
@@ -160,7 +165,7 @@ async function matchWinLoseCount(reportType, date) {
     const winLoseCollection = db.collection(`bucket_${WIN_LOSE_MATCHES_BUCKET_ID}`);
 
     let winLoseData = await winLoseCollection
-        .find({ report_type: reportType, date: { $gte: new Date(date) } })
+        .find({ report_type: reportType, date: dateFilter })
         .toArray()
         .catch(e => {
             console.log("ERROR 44", e);
@@ -254,7 +259,7 @@ async function matchWinLoseCount(reportType, date) {
     return html;
 }
 
-async function playedMatchCount(reportType, date) {
+async function playedMatchCount(reportType, dateFilter) {
     let htmlType = 0;
     let defaultReportType = reportType;
 
@@ -270,7 +275,7 @@ async function playedMatchCount(reportType, date) {
     const userMatchesCollection = db.collection(`bucket_${USERS_MATCH_REPORT_BUCKET_ID}`);
 
     let userMatches = await userMatchesCollection
-        .find({ report_type: reportType, date: { $gte: new Date(date) } })
+        .find({ report_type: reportType, date: dateFilter })
         .toArray()
         .catch(e => {
             console.log("ERROR 43", e);
@@ -362,7 +367,7 @@ async function playedMatchCount(reportType, date) {
     return html;
 }
 
-async function matchGeneralReport(reportType, date) {
+async function matchGeneralReport(reportType, dateFilter) {
     let htmlType = 0;
     let defaultReportType = reportType;
 
@@ -378,7 +383,7 @@ async function matchGeneralReport(reportType, date) {
     const matchCollection = db.collection(`bucket_${MATCH_REPORT_BUCKET_ID}`);
 
     let matchData = await matchCollection
-        .find({ report_type: reportType, date: { $gte: new Date(date) } })
+        .find({ report_type: reportType, date: dateFilter })
         .toArray()
         .catch(e => {
             console.log("ERROR 38", e);
@@ -512,7 +517,7 @@ async function matchGeneralReport(reportType, date) {
     return html;
 }
 
-async function questionsReport(reportType, date) {
+async function questionsReport(reportType, dateFilter) {
     let htmlType = 0;
     let defaultReportType = reportType;
 
@@ -542,7 +547,7 @@ async function questionsReport(reportType, date) {
     });
 
     let answersData = await answersToQuestionsCollection
-        .find({ report_type: reportType, date: { $gte: new Date(date) } })
+        .find({ report_type: reportType, date: dateFilter })
         .toArray()
         .catch(e => {
             console.log("ERROR 45", e);
@@ -679,7 +684,7 @@ async function questionsReport(reportType, date) {
     } else return questionsHtml;
 }
 
-async function chargeReport(reportType, date) {
+async function chargeReport(reportType, dateFilter) {
     let defaultReportType;
     if (reportType == 1 || reportType == 11 || reportType == 22 || reportType == 2) {
         defaultReportType = reportType;
@@ -690,7 +695,7 @@ async function chargeReport(reportType, date) {
     const chargeCollection = db.collection(`bucket_${CHARGE_REPORT_BUCKET_ID}`);
 
     let chargeData = await chargeCollection
-        .find({ report_type: reportType, date: { $gte: new Date(date) } })
+        .find({ report_type: reportType, date: dateFilter })
         .toArray()
         .catch(e => {
             console.log("ERROR 47", e);
@@ -725,8 +730,10 @@ async function chargeReport(reportType, date) {
     let lastDate = "";
 
     chargeData.forEach((charge, index) => {
-        let date = charge.date;
         totalQuantity += charge.quantity;
+    })
+    chargeData.forEach((charge, index) => {
+        let date = charge.date;
         totalPlayCount += typeof charge.play_count == 'number' ? charge.play_count : 0;
         if (defaultReportType == 1 || defaultReportType == 2) {
             let now = new Date();
@@ -741,17 +748,21 @@ async function chargeReport(reportType, date) {
                     <td style="width: 10%;">---</td>
                     <td style="width: 10%;">---</td>
                     <td style="width: 10%;">---</td>
-                    <td style="width: 50%;">---</td>
+                    <td style="width: 10%;">---</td>
+                    <td style="width: 40%;">---</td>
                 </tr>`
         }
+
+        let ratio = defaultReportType == 1 ? charge.quantity == 0 ? 0 : ((charge.quantity / totalQuantity) * 100).toFixed(2) : charge.ratio;
 
         chargeBody += `<tr>
                     <td style="width: 10%;">${new Date(date).toLocaleDateString()}</td>
                     <td style="width: 10%;">${charge.charge_amount}</td>
                     <td style="width: 10%;">${numberWithDot(charge.quantity)}</td>
+                    <td style="width: 10%;">${ratio}</td>
                     <td style="width: 10%;">${numberWithDot(charge.play_count)}</td>
                     <td style="width: 10%;">${charge.status}</td>
-                    <td style="width: 50%;">${charge.error}</td>
+                    <td style="width: 40%;">${charge.error}</td>
                     </tr>
                     `;
 
@@ -766,18 +777,20 @@ async function chargeReport(reportType, date) {
             <th style="width: 10%; text-align:left">Tarih</th>
             <th style="width: 10%; text-align:left">Charging miktarı</th>
             <th style="width: 10%; text-align:left">Adet</th>
+            <th style="width: 10%; text-align:left">Oran</th>
             <th style="width: 10%; text-align:left">Oyun Hakkı</th>
             <th style="width: 10%; text-align:left">Sonu&ccedil;</th>
-            <th style="width: 50%; text-align:left">Hata Detayı</th>
+            <th style="width: 40%; text-align:left">Hata Detayı</th>
             </tr>
             ${chargeBody}
              <tr>
                 <th style="width: 10%; text-align:left">Toplam</th>
                 <th style="width: 10%; text-align:left">-</th>
                 <th style="width: 10%; text-align:left">${numberWithDot(totalQuantity)}</th>
+                <th style="width: 10%; text-align:left">-</th>
                 <th style="width: 10%; text-align:left">${numberWithDot(totalPlayCount)}</th>
                 <th style="width: 10%; text-align:left">-</th>
-                <th style="width: 50%; text-align:left">-</th>
+                <th style="width: 40%; text-align:left">-</th>
             </tr>
             </tbody>
         </table>`;
@@ -785,7 +798,7 @@ async function chargeReport(reportType, date) {
     return chargeHtml;
 }
 
-async function usersReport(reportType, date) {
+async function usersReport(reportType, dateFilter) {
     let defaultReportType;
     if (reportType == 1 || reportType == 11 || reportType == 22 || reportType == 2) {
         defaultReportType = reportType;
@@ -796,7 +809,7 @@ async function usersReport(reportType, date) {
     const usersCollection = db.collection(`bucket_${USERS_REPORT_BUCKET_ID}`);
 
     let usersData = await usersCollection
-        .find({ report_type: reportType, date: { $gte: new Date(date) } })
+        .find({ report_type: reportType, date: dateFilter })
         .toArray()
         .catch(e => {
             console.log("ERROR 41", e);
@@ -847,7 +860,7 @@ async function usersReport(reportType, date) {
     return userHtml;
 }
 
-async function rewardReport(reportType, date) {
+async function rewardReport(reportType, dateFilter) {
     let defaultReportType;
     if (reportType == 1 || reportType == 11 || reportType == 22 || reportType == 2) {
         defaultReportType = reportType;
@@ -858,7 +871,7 @@ async function rewardReport(reportType, date) {
     const rewardCollection = db.collection(`bucket_${REWARD_REPORT_BUCKET_ID}`);
 
     let rewardData = await rewardCollection
-        .find({ report_type: reportType, date: { $gte: new Date(date) } })
+        .find({ report_type: reportType, date: dateFilter })
         .toArray()
         .catch(e => {
             console.log("ERROR 47", e);
@@ -886,26 +899,31 @@ async function rewardReport(reportType, date) {
     let lastDate = "";
 
     rewardData.forEach((reward, index) => {
+        total += reward.count;
+    })
+    rewardData.forEach((reward, index) => {
         let date = reward.date;
         if (defaultReportType == 1 || defaultReportType == 2) {
             let now = new Date();
             date = now.setDate(now.getDate() - 1);
         }
-        total += reward.count;
 
         if (lastDate && lastDate != new Date(date).toDateString()) {
             rewardBody += `
                 <tr>
                     <td style="width: 10%;">---</td>
                     <td style="width: 10%;">---</td>
-                    <td style="width: 80%;">---</td>
+                    <td style="width: 10%;">---</td>
+                    <td style="width: 70%;">---</td>
                 </tr>`
         }
 
+        let ratio = defaultReportType == 1 ? reward.count == 0 ? 0 : ((reward.count / total) * 100).toFixed(2) : reward.ratio;
         rewardBody += `<tr>
                     <td style="width: 10%;">${new Date(date).toLocaleDateString()}</td>
                     <td style="width: 10%;">${numberWithDot(reward.count)}</td>
-                    <td style="width: 80%;">${reward.error_text}</td>
+                    <td style="width: 10%;">${ratio}</td>
+                    <td style="width: 70%;">${reward.error_text}</td>
                     </tr>
                     `;
 
@@ -919,13 +937,15 @@ async function rewardReport(reportType, date) {
             <tr>
             <th style="width: 10%; text-align:left">Tarih</th>
             <th style="width: 10%; text-align:left">Adet</th>
-            <th style="width: 80%; text-align:left">Hata Detayı</th>
+            <th style="width: 10%; text-align:left">Oran</th>
+            <th style="width: 70%; text-align:left">Hata Detayı</th>
             </tr>
             ${rewardBody}
              <tr>
             <th style="width: 10%; text-align:left">Toplam</th>
             <th style="width: 10%; text-align:left">${numberWithDot(total)}</th>
-            <th style="width: 80%; text-align:left">-</th>
+            <th style="width: 10%; text-align:left">-</th>
+            <th style="width: 70%; text-align:left">-</th>
             </tr>
             </tbody>
         </table>`;
@@ -933,7 +953,7 @@ async function rewardReport(reportType, date) {
     return rewardHtml;
 }
 
-async function retryReport(reportType, date) {
+async function retryReport(reportType, dateFilter) {
     let defaultReportType;
     if (reportType == 1 || reportType == 11 || reportType == 22 || reportType == 2) {
         defaultReportType = reportType;
@@ -944,7 +964,7 @@ async function retryReport(reportType, date) {
     const retryCollection = db.collection(`bucket_${RETRY_REPORT_BUCKET_ID}`);
 
     let retryData = await retryCollection
-        .find({ report_type: reportType, date: { $gte: new Date(date) } })
+        .find({ report_type: reportType, date: dateFilter })
         .toArray()
         .catch(e => {
             console.log("ERROR 41", e);

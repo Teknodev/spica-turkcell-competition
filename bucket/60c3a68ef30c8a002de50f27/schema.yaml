@@ -26,6 +26,12 @@ properties:
     options:
       position: bottom
     default: 0
+  ratio:
+    type: number
+    title: ratio
+    description: Description of the ratio input
+    options:
+      position: bottom
   status:
     type: string
     title: status
