@@ -65,10 +65,10 @@ triggers:
       preflight: true
     type: http
     active: true
-  chargeTestMan:
+  testManChargeAndReward:
     options:
       method: Get
-      path: /chargeTestMan
+      path: /testManChargeAndReward
       preflight: true
     type: http
     active: true

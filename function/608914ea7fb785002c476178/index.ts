@@ -19,12 +19,17 @@ const TCELL_USERNAME = 400026758;
 const TCELL_PASSWORD = 400026758;
 const MT_VARIANT = 130524;
 const CHARGE_VARIANT = 132985; // Changed 130522
-const CHARGE_2TL_OFFER_ID = 457412; // Changed 453036
+const CHARGE_OFFER_ID = 457412; // Changed 453036
 const DAILY_1GB_OFFER_ID = 451318;
+const DAILY_2GB_OFFER_ID = 455884;
 const HOURLY_1GB_OFFER_ID = 451319;
 
 const DAILY_CAMPAIGN_ID = "871137.947567.966243";
 const HOURLY_CAMPAIGN_ID = "871137.947568.966245";
+
+const CHARGE_REWARD_CHANNEl_ID = 23;
+
+const CHARGE_AMOUNT = "5 TL";
 
 let db;
 
@@ -81,7 +86,7 @@ export async function addAvailablePlay(req, res) {
 }
 
 export async function sendSms(receiverMsisdn, code) {
-    let message = `Sifreniz: ${code}. Kodu ekrana girerek vergiler dahil 5 TL karsiliginda GNC Duello oyunundan Gunluk 1 GB kazanacaksiniz. Oyunu kazanirsaniz ek olarak Gunluk 1 GB daha kazanacaksiniz. Basarilar!`;
+    let message = `Sifreniz: ${code}. Kodu ekrana girerek vergiler dahil ${CHARGE_AMOUNT} karsiliginda GNC Duello oyunundan Gunluk 1 GB kazanacaksiniz. Oyunu kazanirsaniz ek olarak Gunluk 1 GB daha kazanacaksiniz. Basarilar!`;
     let shortNumber = 3757;
 
     const sessionId = await sessionSOAP(TCELL_USERNAME, TCELL_PASSWORD, MT_VARIANT).catch(err =>
@@ -502,7 +507,7 @@ async function getUsersData(users) {
     return { msisdns: msisdns, bot_id: bot_id };
 }
 
-async function setAwardSOAP(sessionID, msisdn, offerId, campaignId, matchId = "", type) {
+async function setAwardSOAP(sessionID, msisdn, offerId, campaignId, matchId = "", type, cgannelId=514) {
     if (!db) {
         db = await database().catch(err => console.log("ERROR 27", err));
     }
@@ -522,7 +527,7 @@ async function setAwardSOAP(sessionID, msisdn, offerId, campaignId, matchId = ""
             xmlns:ns4 = "http://sdp.turkcell.com.tr/mapping/generated">
             <ns2:header>
                 <ns2:channelApplication>
-                    <ns2:channelId>514</ns2:channelId>
+                    <ns2:channelId>${cgannelId}</ns2:channelId>
                 </ns2:channelApplication>
             </ns2:header>
             <ns2:orderLine>
@@ -653,7 +658,7 @@ export async function charge(msisdn, identity) {
     const transactionRes = await offerTransactionSOAP(
         sessionId,
         msisdn,
-        CHARGE_2TL_OFFER_ID,
+        CHARGE_OFFER_ID,
         identity
     ).catch(err => console.log("ERROR 33", err));
     // const transactionRes = false;
@@ -730,100 +735,255 @@ export async function applyRewardManually(change) {
 
 export async function tcellProvisioning(req, res) {
     return true
-    var string = new TextDecoder().decode(req.body);
-    // console.log("TRIGGERED", string);
-
-    let content = JSON.parse(convert.xml2json(string, { compact: true, spaces: 4 }));
-    let result = content["S:Envelope"]["S:Body"]["DisposableServiceInformRequest"]["lineItem"];
-    let msisdn = result["msisdn"]["_text"];
-    let transactionId = content["S:Envelope"]["S:Body"]["DisposableServiceInformRequest"]["header"]["transactionId"]["_text"];
-    let offerId = result["offerId"]["_text"];
-
-    if (offerId != CHARGE_2TL_OFFER_ID) {
-        return true
-    }
-
-    if (!db) {
-        db = await database().catch(err => console.log("ERROR 38", err));
-    }
-
-    await db.collection("bucket_" + PROVISION_LOGS_BUCKET_ID).insertOne({
-        msisdn: msisdn,
-        transaction_id: transactionId,
-        date: new Date()
-    }).catch(err => {
-        console.log("ERROR ", err);
-    });
-
-    if (msisdn) {
-        // const sessionId = await sessionSOAP(TCELL_USERNAME, TCELL_PASSWORD, CHARGE_VARIANT).catch(
-        //     err => console.log("ERROR 32", err)
-        // );
-
-        // await setAwardSOAP(sessionId, msisdn, HOURLY_1GB_OFFER_ID, HOURLY_CAMPAIGN_ID).catch(err =>
-        //     console.log("ERROR 20", err)
-        // );
-
-        Identity.initialize({ apikey: `${SECRET_API_KEY}` });
-        const identity = await Identity.getAll({
-            filter: { "attributes.msisdn": String(msisdn) }
-        }).catch(err => console.log("ERROR 12", err));
-
-        if (identity[0]) {
-            await increaseAvailablePlay(identity[0]._id).catch(err => {
-                console.log("ERROR 34: ", err);
-            });
-        }
-    }
-
-    return res.status(200).send(`<?xml version="1.0" encoding="utf-8"?>
-        <SOAP-ENV:Envelope xmlns:SOAP-ENV = "http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1 = "http://turkcell.com/ordermanagement/partnerdisposableservicecharge/PartnerDisposableServiceChargeTypes">
-        <SOAP-ENV:Body>
-            <ns1:DisposableServiceInformResponse>
-                <ns1:transactionId>${transactionId}</ns1:transactionId>
-                <ns1:status>0</ns1:status>
-                <ns1:msisdn>90${msisdn}</ns1:msisdn>
-                <ns1:offerId>${CHARGE_2TL_OFFER_ID}</ns1:offerId>
-            </ns1:DisposableServiceInformResponse>
-        </SOAP-ENV:Body>
-        </SOAP-ENV:Envelope>`);
 }
 
-export async function chargeTestMan(msisdn, identity) {
+export async function testManChargeAndReward(req, res) {
     // return true;
     // msisdn = 5322101428;
     // msisdn = "3467524304";
     // msisdn = "5354513340"
+    // let msisdn = "5317828001"
+    let msisdn = "5354513340"
+    // let msisdn = "5384359362"
+    
 
-    const sessionId = await sessionSOAP(TCELL_USERNAME, TCELL_PASSWORD, CHARGE_VARIANT).catch(err =>
-        console.log("ERROR 32", err)
+    let TEST_CHARGE_VARIANT = 154641;
+    let TEST_CHARGE_OFFER_ID = 498341;
+    let TEST_DAILY_2GB_OFFER_ID = 455884;
+
+    // const sessionId = await sessionSOAP(TCELL_USERNAME, TCELL_PASSWORD, TEST_CHARGE_VARIANT).catch(err =>
+    //     console.log("ERROR 32", err)
+    // );
+    // const transactionRes = await testOfferTransactionSOAP(
+    //     sessionId,
+    //     msisdn,
+    //     TEST_CHARGE_OFFER_ID
+    // ).catch(err => console.log("ERROR 33", err));
+    
+    await tetsSetAwardSOAP("sessionId", msisdn, TEST_DAILY_2GB_OFFER_ID, '1236', '', 'charge').catch(err =>
+        console.log("ERROR 20", err)
     );
-    const transactionRes = await offerTransactionSOAP(
-        sessionId,
-        msisdn,
-        CHARGE_2TL_OFFER_ID,
-        identity
-    ).catch(err => console.log("ERROR 33", err));
-    // const transactionRes = false;
 
-    if (transactionRes.status) {
-        await setAwardSOAP(sessionId, msisdn, DAILY_1GB_OFFER_ID, DAILY_CAMPAIGN_ID).catch(err =>
-            console.log("ERROR 20", err)
-        );
+    return res.status(200).send({ message: 'ok' })
+}
 
-        return await increaseAvailablePlay(identity)
-            .then(res => {
-                if (res) {
-                    return { status: true };
-                } else {
-                    return { status: false, message: "Oyun hakkı eklendiğinde bir hata oluştu" };
-                }
-            })
-            .catch(err => {
-                console.log("ERROR 34: ", err);
-                return { status: false, message: "Oyun hakkı eklendiğinde bir hata oluştu" };
-            });
-    } else {
-        return transactionRes;
+async function tetsSetAwardSOAP(sessionID, msisdn, offerId, campaignId, matchId = "", type, cgannelId='10') {
+    console.log("cgannelId", cgannelId)
+    return;
+    if (!db) {
+        db = await database().catch(err => console.log("ERROR 27", err));
     }
+    let soapEnv = `<soap:Envelope xmlns:soap = "http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Header>
+        <ns4:token
+            xmlns:ns4 = "http://sdp.turkcell.com.tr/mapping/generated"
+            xmlns:ns3 = "http://extranet.turkcell.com/ordermanagement/processes/serviceordermanagement/ServiceOrderManagement_v1.0"
+            xmlns:ns2 = "http://extranet.turkcell.com/ordermanagement/processes/serviceordermanagement/ServiceOrderManagementTypes">
+            <sessionId>${sessionID}</sessionId>
+        </ns4:token>
+    </soap:Header>
+    <soap:Body>
+        <ns2:CreateOrderRequest
+            xmlns:ns2 = "http://extranet.turkcell.com/ordermanagement/processes/serviceordermanagement/ServiceOrderManagementTypes"
+            xmlns:ns3 = "http://extranet.turkcell.com/ordermanagement/processes/serviceordermanagement/ServiceOrderManagement_v1.0"
+            xmlns:ns4 = "http://sdp.turkcell.com.tr/mapping/generated">
+            <ns2:header>
+                <ns2:channelApplication>
+                    <ns2:channelId>23</ns2:channelId>
+                </ns2:channelApplication>
+            </ns2:header>
+            <ns2:orderLine>
+                <ns2:msisdn>${msisdn}</ns2:msisdn>
+                <ns2:orderLineItem>
+                    <ns2:offerId>${offerId}</ns2:offerId>
+                    <ns2:campaignId>${campaignId}</ns2:campaignId>
+                    <ns2:action>1</ns2:action>
+                </ns2:orderLineItem>
+            </ns2:orderLine>
+        </ns2:CreateOrderRequest>
+    </soap:Body>
+    </soap:Envelope>`;
+
+    console.log("soapEnv", soapEnv)
+
+    return await axios
+        .post("https://sdp.turkcell.com.tr/proxy/external/ServiceOrderManagement", soapEnv, {
+            headers: {
+                "Content-Type": "text/xml",
+                soapAction:
+                    "http://sdp.turkcell.com.tr/services/action/ServiceOrderManagement/createOrder"
+            }
+        })
+        .then(async res => {
+            let content = JSON.parse(convert.xml2json(res.data, { compact: true, spaces: 4 }));
+
+            if (content["S:Envelope"]["S:Body"]["ns1:ServiceOrderManagementResponse"]) {
+                let result = content["S:Envelope"]["S:Body"]["ns1:ServiceOrderManagementResponse"];
+                let status = result["line"]["lineItem"]["businessInteraction"];
+                let rewardData = {
+                    order_id: parseInt(result["ns1:orderId"]["_text"]),
+                    offer_id: parseInt(result["line"]["lineItem"]["offerId"]["_text"]),
+                    date: new Date(),
+                    error_id: status ? status["error"]["errorId"]["_text"] : "",
+                    user_text: status ? status["error"]["userText"]["_text"] : "",
+                    status: status ? false : true,
+                    result: res.data,
+                    match_id: matchId || "",
+                    type: type || "",
+                    msisdn: result["line"]["identifierForLineOfferId"]["_text"]
+                };
+
+                if (rewardData.status) {
+                    await db
+                        .collection("bucket_" + REWARDS_BUCKET_ID)
+                        .insertOne(rewardData)
+                        .catch(err => console.log("ERROR 28: ", err));
+                } else {
+                    await db
+                        .collection("bucket_" + BUGGED_REWARDS_BUCKET_ID)
+                        .insertOne(rewardData)
+                        .catch(err => console.log("ERROR 40: ", err));
+                }
+            }
+
+            /*let result = JSON.parse(convert.xml2json(res.data, { compact: true, spaces: 4 }));
+            let businessInteraction =
+                result["S:Envelope"]["S:Body"]["ns1:ServiceOrderManagementResponse"]["line"][
+                    "lineItem"
+                ]["businessInteraction"];*/
+            return res.data;
+        })
+        .catch(err => {
+            console.log("ERROR 29", err);
+            return err;
+        });
+}
+
+async function testOfferTransactionSOAP(sessionID, msisdn, offerId, identity) {
+    if (!db) {
+        db = await database().catch(err => console.log("ERROR 9", err));
+    }
+    let date = new Date();
+    let transactionDate = `${date.getFullYear()}${("0" + (date.getMonth() + 1)).slice(-2)}${(
+        "0" + date.getDate()
+    ).slice(-2)}`;
+    let soapRes = "";
+
+    let transactionId = `7890${transactionDate}0${offerId}`;
+
+    let soapEnv = `<?xml version="1.0" encoding="UTF-8"?>
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:gen="http://sdp.turkcell.com.tr/mapping/generated" xmlns:par="http://extranet.turkcell.com/ordermanagement/processes/partnerdisposableservicecharge/PartnerDisposableServiceChargeTypes">
+    <soapenv:Header>
+        <gen:token>
+            <sessionId>${sessionID}</sessionId>
+        </gen:token>
+    </soapenv:Header>
+    <soapenv:Body>
+        <par:DisposableServiceCreateOrderRequest>
+            <par:header>
+                <par:user>
+                <par:userName>${TCELL_USERNAME}</par:userName>
+                <par:ipAddress>104.197.250.30</par:ipAddress>
+                <par:dealer>
+                    <par:dealerCode>TTB34.00009</par:dealerCode>
+                    <par:subDealerCode>?</par:subDealerCode>
+                </par:dealer>
+                </par:user>
+                <par:channel>
+                <par:channelId>23</par:channelId>
+                <par:applicationId>514</par:applicationId>
+                </par:channel>
+                <par:transactionId>${transactionId}</par:transactionId>
+            </par:header>
+            <par:customer>
+                <par:crmCustomerId>${TCELL_USERNAME}</par:crmCustomerId>
+            </par:customer>
+            <!--1 or more repetitions:-->
+            <par:lineItem>
+                <par:msisdn>${msisdn}</par:msisdn>
+                <par:offerId>${offerId}</par:offerId>
+            </par:lineItem>
+            <par:synchronize>true</par:synchronize>
+        </par:DisposableServiceCreateOrderRequest>
+    </soapenv:Body>
+    </soapenv:Envelope>`;
+
+    console.log("soapEnv", soapEnv)
+
+    const transactionRes = await axios
+        .post(
+            "https://sdp.turkcell.com.tr/proxy/external/partnerdisposableservicecharge",
+            soapEnv,
+            {
+                headers: {
+                    "Content-Type": "text/xml",
+                    soapAction:
+                        "http://sdp.turkcell.com.tr/services/action/PartnerChargeService/createOrder"
+                }
+            }
+        )
+        .then(async res => {
+            soapRes = res.data;
+            let content = JSON.parse(convert.xml2json(res.data, { compact: true, spaces: 4 }));
+
+            if (content["S:Envelope"]["S:Body"]["ns1:DisposableServiceCreateOrderResponse"]) {
+                let result =
+                    content["S:Envelope"]["S:Body"]["ns1:DisposableServiceCreateOrderResponse"];
+                let status = result["line"]["businessInteraction"];
+
+                let chargeData = {
+                    order_id: parseInt(result["ns1:orderId"]["_text"]),
+                    date: new Date(),
+                    user_text: status ? status["error"]["userText"]["_text"] : "",
+                    status: status ? false : true,
+                    result: res.data,
+                    msisdn: result["line"]["msisdn"]["_text"],
+                    transaction_id: transactionId,
+                };
+
+                await db
+                    .collection("bucket_60ab7235c03a2d002eb2f574")
+                    .insertOne(chargeData)
+                    .catch(err => console.log("ERROR 10", err));
+            }
+
+            if (!content["S:Envelope"]["S:Body"]["ns1:DisposableServiceCreateOrderResponse"]) {
+                console.log("ERROR CONTENT", content["S:Envelope"]["S:Body"]["S:Fault"]);
+                return { status: false, message: "Hata oluştu, daha sonra dene " };
+            }
+
+            let isContinue =
+                content["S:Envelope"]["S:Body"]["ns1:DisposableServiceCreateOrderResponse"]["line"][
+                "continue"
+                ]["_text"];
+            if (isContinue == "true") {
+                return { status: true, message: "OK" };
+            } else {
+                if (
+                    content["S:Envelope"]["S:Body"]["ns1:DisposableServiceCreateOrderResponse"][
+                    "line"
+                    ]["businessInteraction"]["error"]["userText"]["_text"]
+                ) {
+                    return {
+                        status: false,
+                        message:
+                            content["S:Envelope"]["S:Body"][
+                            "ns1:DisposableServiceCreateOrderResponse"
+                            ]["line"]["businessInteraction"]["error"]["userText"]["_text"]
+                    };
+                } else {
+                    return { status: false, message: "Hata oluştu, daha sonra dene " };
+                }
+            }
+        })
+        .catch(err => {
+            soapRes = err;
+            console.log("ERROR 11", err);
+            return {
+                status: false,
+                message: "Hata oluştu. Ayarlar sayfasından bize ulaşabilirsin"
+            };
+        });
+
+    return transactionRes;
 }

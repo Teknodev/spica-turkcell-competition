@@ -25,6 +25,7 @@ const REWARD_REPORT_BUCKET_ID = process.env.REWARD_REPORT_BUCKET_ID;
 const BUGGED_REWARD_BUCKET_ID = process.env.BUGGED_REWARD_BUCKET_ID;
 
 const DAILY_1GB_OFFER_ID = 451318;
+const CHARGE_AMOUNT = "5 TL";
 
 export async function executeReportDaily() {
     let date = new Date().setDate(new Date().getDate() - 1)
@@ -401,7 +402,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
     const datas = [
         {
             date: new Date(reportDate),
-            charge_amount: "5 TL",
+            charge_amount: CHARGE_AMOUNT,
             quantity: chargesSuccessful.length,
             ratio: chargesSuccessful.length ? Number(((chargesSuccessful.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarılı",
@@ -411,7 +412,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         },
         {
             date: new Date(reportDate),
-            charge_amount: "5 TL",
+            charge_amount: CHARGE_AMOUNT,
             quantity: error1.length,
             ratio: error1.length ? Number(((error1.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
@@ -422,7 +423,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         },
         {
             date: new Date(reportDate),
-            charge_amount: "5 TL",
+            charge_amount: CHARGE_AMOUNT,
             quantity: error2.length,
             ratio: error2.length ? Number(((error2.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
@@ -432,7 +433,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         },
         {
             date: new Date(reportDate),
-            charge_amount: "5 TL",
+            charge_amount: CHARGE_AMOUNT,
             quantity: error3.length,
             ratio: error3.length ? Number(((error3.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
@@ -442,7 +443,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         },
         {
             date: new Date(reportDate),
-            charge_amount: "5 TL",
+            charge_amount: CHARGE_AMOUNT,
             quantity: error4.length,
             ratio: error4.length ? Number(((error4.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
@@ -452,7 +453,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         },
         {
             date: new Date(reportDate),
-            charge_amount: "5 TL",
+            charge_amount: CHARGE_AMOUNT,
             quantity: error5.length,
             ratio: error5.length ? Number(((error5.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
@@ -463,7 +464,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         },
         {
             date: new Date(reportDate),
-            charge_amount: "5 TL",
+            charge_amount: CHARGE_AMOUNT,
             quantity: error6.length,
             ratio: error6.length ? Number(((error6.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
@@ -473,7 +474,7 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         },
         {
             date: new Date(reportDate),
-            charge_amount: "5 TL",
+            charge_amount: CHARGE_AMOUNT,
             quantity: error7.length,
             ratio: error7.length ? Number(((error7.length / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
