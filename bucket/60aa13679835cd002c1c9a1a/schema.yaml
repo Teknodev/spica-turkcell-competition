@@ -19,8 +19,8 @@ properties:
     options:
       position: bottom
     enum:
-      - hourly_1
       - daily_1
+      - daily_2
   created_at:
     type: date
     title: created_at

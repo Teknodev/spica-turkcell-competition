@@ -12,6 +12,7 @@ const BUGGED_REWARDS_BUCKET_ID = process.env.BUGGED_REWARDS_BUCKET_ID;
 
 const DAILY_1GB_OFFER_ID = 451318;
 const HOURLY_1GB_OFFER_ID = 451319;
+const DAILY_2GB_OFFER_ID = 455884;
 
 let db;
 
@@ -171,7 +172,7 @@ async function retryTcellIssues() {
         if (retryCount.length < 24) {
             insertReward(
                 reward.msisdn.substring(2),
-                reward.offer_id == HOURLY_1GB_OFFER_ID ? "hourly_1" : "daily_1",
+                reward.offer_id == DAILY_2GB_OFFER_ID ? "daily_2" : "daily_1",
                 reward._id
             );
         }

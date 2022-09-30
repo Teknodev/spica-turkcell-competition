@@ -817,16 +817,16 @@ export async function getManuallyRewardDashboard(req, res) {
             "Tek seferde hem saatlik hemde günlük yükleyebilirsiniz.",
         inputs: [
             {
-                key: "hourly",
+                key: "daily_1gb",
                 type: "string",
                 value: "",
-                title: "Hourly Reward MSISDNS"
+                title: "Daily 1GB Reward MSISDNS"
             },
             {
-                key: "daily",
+                key: "daily_2gb",
                 type: "string",
                 value: "",
-                title: "Daily Reward MSISDNS"
+                title: "Daily 2GB Reward MSISDNS"
             },
             {
                 key: "key",
@@ -852,29 +852,29 @@ export async function dashboardManuallyReward(req, res) {
 
     if (req.query.key == dashboard_key.value) {
         Bucket.initialize({ apikey: `${SECRET_API_KEY}` });
-        let hourlyMsisdns = req.query.hourly;
-        let dailyMsisdns = req.query.daily;
-        hourlyMsisdns = hourlyMsisdns ? hourlyMsisdns.split(",") : [];
-        dailyMsisdns = dailyMsisdns ? dailyMsisdns.split(",") : [];
+        let daily1GBMsisdns = req.query.daily_1gb;
+        let daily2GBMsisdns = req.query.daily_2gb;
+        daily1GBMsisdns = daily1GBMsisdns ? daily1GBMsisdns.split(",") : [];
+        daily2GBMsisdns = daily2GBMsisdns ? daily2GBMsisdns.split(",") : [];
 
-        if (hourlyMsisdns[0]) {
-            for (let msisdn of hourlyMsisdns) {
+        if (daily1GBMsisdns[0]) {
+            for (let msisdn of daily1GBMsisdns) {
                 await Bucket.data
                     .insert(MANUALLY_REWARD_BUCKET_ID, {
                         msisdn: Number(msisdn),
-                        reward: "hourly_1"
+                        reward: "daily_1"
                     })
                     .catch(error => {
                         console.log("ERROR 14", error);
                     });
             }
         }
-        if (dailyMsisdns[0]) {
-            for (let msisdn of dailyMsisdns) {
+        if (daily2GBMsisdns[0]) {
+            for (let msisdn of daily2GBMsisdns) {
                 await Bucket.data
                     .insert(MANUALLY_REWARD_BUCKET_ID, {
                         msisdn: Number(msisdn),
-                        reward: "daily_1"
+                        reward: "daily_2"
                     })
                     .catch(error => {
                         console.log("ERROR 14", error);

@@ -19,10 +19,8 @@ const CHARGE_VARIANT = 154641;
 const CHARGE_OFFER_ID = 498341;
 const DAILY_1GB_OFFER_ID = 451318;
 const DAILY_2GB_OFFER_ID = 455884;
-const HOURLY_1GB_OFFER_ID = 451319;
 
 const DAILY_CAMPAIGN_ID = "871137.947567.966243";
-const HOURLY_CAMPAIGN_ID = "871137.947568.966245";
 const DAILY_2GB_CAMPAIGN_ID = "1236";
 
 const CHARGE_REWARD_CHANNEl_ID = 23;
@@ -703,21 +701,21 @@ export async function applyRewardManually(change) {
             .catch(err => console.log(err));
         matchID = matchID[0].match_id;
     }
-    if (change.current.reward == "hourly_1") {
-        result = await setAwardSOAP(
-            sessionId,
-            change.current.msisdn,
-            HOURLY_1GB_OFFER_ID,
-            HOURLY_CAMPAIGN_ID,
-            matchID,
-            'manual'
-        ).catch(err => console.log("ERROR 36", err));
-    } else if (change.current.reward == "daily_1") {
+    if (change.current.reward == "daily_1") {
         result = await setAwardSOAP(
             sessionId,
             change.current.msisdn,
             DAILY_1GB_OFFER_ID,
             DAILY_CAMPAIGN_ID,
+            matchID,
+            'manual'
+        ).catch(err => console.log("ERROR 36", err));
+    } else if (change.current.reward == "daily_2") {
+        result = await setAwardSOAP(
+            sessionId,
+            change.current.msisdn,
+            DAILY_2GB_OFFER_ID,
+            DAILY_2GB_CAMPAIGN_ID,
             matchID,
             'manual'
         ).catch(err => console.log("ERROR 37", err));
