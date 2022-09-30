@@ -296,26 +296,26 @@ async function isMatchFinished(duel) {
         if (duel.winner_of_current_question == 1) {
             if (!user1.bot) {
                 user1.win_count += 1;
-                user1EarnedAward += duel.user1_is_free ? 1 : 2;
+                user1EarnedAward += duel.user1_is_free ? 1 : 3;
                 user1EarnedPoints += 100;
                 user1.elo += 25;
             }
             if (!user2.bot) {
-                user2EarnedAward += duel.user2_is_free ? 0 : 1;
+                user2EarnedAward += duel.user2_is_free ? 0 : 2;
                 user2.lose_count += 1;
                 user2.elo = Math.max(user2.elo - 25, 0);
             }
         } else if (duel.winner_of_current_question == 2) {
             if (!user2.bot) {
                 user2.win_count += 1;
-                user2EarnedAward += duel.user2_is_free ? 1 : 2;
+                user2EarnedAward += duel.user2_is_free ? 1 : 3;
                 user2EarnedPoints += 100;
                 user2.elo += 25;
             }
 
             if (!user1.bot) {
                 user1.lose_count += 1;
-                user1EarnedAward += duel.user1_is_free ? 0 : 1;
+                user1EarnedAward += duel.user1_is_free ? 0 : 2;
                 user1.elo = Math.max(user1.elo - 25, 0);
             }
         }

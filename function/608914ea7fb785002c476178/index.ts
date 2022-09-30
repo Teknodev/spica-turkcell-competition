@@ -8,28 +8,26 @@ var convert = require("xml-js");
 const SECRET_API_KEY = process.env.SECRET_API_KEY;
 const USER_BUCKET_ID = process.env.USER_BUCKET_ID;
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
-const DUEL_BUCKET_ID = process.env.DUEL_BUCKET_ID;
-const CHARGE_BUCKET_ID = process.env.CHARGE_BUCKET_ID;
 const CONFIRMATION_CODE_BUCKET_ID = process.env.CONFIRMATION_CODE_BUCKET_ID;
 const REWARDS_BUCKET_ID = process.env.REWARDS_BUCKET_ID;
 const BUGGED_REWARDS_BUCKET_ID = process.env.BUGGED_REWARDS_BUCKET_ID;
-const PROVISION_LOGS_BUCKET_ID = process.env.PROVISION_LOGS_BUCKET_ID;
 
 const TCELL_USERNAME = 400026758;
 const TCELL_PASSWORD = 400026758;
 const MT_VARIANT = 130524;
-const CHARGE_VARIANT = 132985; // Changed 130522
-const CHARGE_OFFER_ID = 457412; // Changed 453036
+const CHARGE_VARIANT = 154641;
+const CHARGE_OFFER_ID = 498341;
 const DAILY_1GB_OFFER_ID = 451318;
 const DAILY_2GB_OFFER_ID = 455884;
 const HOURLY_1GB_OFFER_ID = 451319;
 
 const DAILY_CAMPAIGN_ID = "871137.947567.966243";
 const HOURLY_CAMPAIGN_ID = "871137.947568.966245";
+const DAILY_2GB_CAMPAIGN_ID = "1236";
 
 const CHARGE_REWARD_CHANNEl_ID = 23;
 
-const CHARGE_AMOUNT = "5 TL";
+const CHARGE_AMOUNT = "9 TL";
 
 let db;
 
@@ -86,7 +84,7 @@ export async function addAvailablePlay(req, res) {
 }
 
 export async function sendSms(receiverMsisdn, code) {
-    let message = `Sifreniz: ${code}. Kodu ekrana girerek vergiler dahil ${CHARGE_AMOUNT} karsiliginda GNC Duello oyunundan Gunluk 1 GB kazanacaksiniz. Oyunu kazanirsaniz ek olarak Gunluk 1 GB daha kazanacaksiniz. Basarilar!`;
+    let message = `Sifreniz: ${code}. Kodu ekrana girerek vergiler dahil ${CHARGE_AMOUNT} karsiliginda GNC Duello oyunundan Gunluk 2 GB kazanacaksiniz. Oyunu kazanirsaniz ek olarak Gunluk 1 GB daha kazanacaksiniz. Basarilar!`;
     let shortNumber = 3757;
 
     const sessionId = await sessionSOAP(TCELL_USERNAME, TCELL_PASSWORD, MT_VARIANT).catch(err =>
@@ -664,7 +662,7 @@ export async function charge(msisdn, identity) {
     // const transactionRes = false;
 
     if (transactionRes.status) {
-        await setAwardSOAP(sessionId, msisdn, DAILY_1GB_OFFER_ID, DAILY_CAMPAIGN_ID, '', 'charge').catch(err =>
+        await setAwardSOAP(sessionId, msisdn, DAILY_2GB_OFFER_ID, DAILY_2GB_CAMPAIGN_ID, '', 'charge', CHARGE_REWARD_CHANNEl_ID).catch(err =>
             console.log("ERROR 20", err)
         );
 
