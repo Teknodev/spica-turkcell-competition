@@ -1,4 +1,4 @@
-import { database } from "@spica-devkit/database";
+import { database, ObjectId } from "@spica-devkit/database";
 import * as Bucket from "@spica-devkit/bucket";
 
 const USER_BUCKET_ID = process.env.USER_BUCKET_ID;
@@ -18,7 +18,7 @@ export async function updateConfirmCode() {
     date.setMinutes(date.getMinutes() - 2)
 
     const db = await database();
-    
+
     const confirmCodeCollection = db.collection(`bucket_${CONFIRMATION_CODE_BUCKET_ID}`);
     confirmCodeCollection.updateMany({
         sent_date: { $lt: date },

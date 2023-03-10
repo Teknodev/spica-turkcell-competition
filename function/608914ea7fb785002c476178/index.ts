@@ -25,7 +25,7 @@ const DAILY_2GB_CAMPAIGN_ID = "1236";
 
 const CHARGE_REWARD_CHANNEl_ID = 23;
 
-const CHARGE_AMOUNT = "9 TL";
+const CHARGE_AMOUNT = "12 TL";
 
 let db;
 

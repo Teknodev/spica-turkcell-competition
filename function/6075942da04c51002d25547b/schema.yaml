@@ -10,12 +10,6 @@ triggers:
       frequency: 0 0 * * 1
     type: schedule
     active: true
-  setFreePlay15:
-    options:
-      timezone: Europe/Istanbul
-      frequency: 0 0 15 * *
-    type: schedule
-    active: true
   detectError:
     options:
       method: Get

@@ -15,6 +15,8 @@ const CONFIGURATION_BUCKET_ID = process.env.CONFIGURATION_BUCKET_ID;
 const BUGGED_REWARDS_BUCKET_ID = process.env.BUGGED_REWARDS_BUCKET_ID;
 const DELETED_MATCHES_BUCKET_ID = process.env.DELETED_MATCHES_BUCKET_ID;
 
+const CHARGE_AMOUNT = '12 TL';
+
 let db;
 export async function matchChart(req, res) {
     if (req.query.key == "wutbztACHHbT") {
@@ -625,8 +627,6 @@ export async function userDashboardCharges(req, res) {
         let msisdn = "";
         let begin = new Date("12-31-2021 21:00:0");
         let end = new Date();
-        let changeDate_3TL = new Date("2021-07-14T08:00:00.435Z");
-        let changeDate_5TL = new Date("2021-02-11T11:00:00.435Z");
         let charges = [];
 
         if (req.query.filter != "undefined") {
@@ -662,19 +662,11 @@ export async function userDashboardCharges(req, res) {
 
                 charges = charges.map(data => {
                     let date = new Date(data.date);
-                    let amount = '';
-                    if (date < changeDate_3TL) {
-                        amount = "2 TL";
-                    } else if (date > changeDate_3TL && date < changeDate_5TL) {
-                        amount = "3 TL";
-                    } else {
-                        amount = "5 TL";
-                    }
                     date.setHours(date.getHours() + 3);
                     return {
                         _id: data._id,
                         date: date,
-                        amount: amount,
+                        amount: CHARGE_AMOUNT,
                         status: data.status,
                         user_text: data.user_text
                     };
@@ -1262,7 +1254,7 @@ export async function getLeaderUsersDashboard(req, res) {
 
     let user2Matches = await pastMatchesCollection
         .aggregate([
-            { $match: { end_time: dateFilter, duel_type: 0 } },
+            { $match: { end_time: dateFilter, player_type: 0 } },
             {
                 $group: {
                     _id: "$user2",
@@ -1539,7 +1531,7 @@ export async function downloadUserAnalysisReport(req, res) {
         if (pastMatches.length) {
             pastMatches.forEach(data => {
                 users.push(ObjectId(data.user1))
-                if (data.duel_type == 0) {
+                if (data.player_type == 0) {
                     users.push(ObjectId(data.user2))
                 }
             })
@@ -1575,7 +1567,7 @@ export async function downloadUserAnalysisReport(req, res) {
             endTime.setHours(endTime.getHours() + 3);
 
             let users = [data.user1]
-            if (data.duel_type == 0) users.push(data.user2)
+            if (data.player_type == 0) users.push(data.user2)
 
             for (let [index, user] of users.entries()) {
 
@@ -1588,7 +1580,7 @@ export async function downloadUserAnalysisReport(req, res) {
                     if (userIdentity) {
                         let opponent = '';
                         let date = `${startTime.getDate()}/${startTime.getMonth() + 1}/${startTime.getFullYear()} ${getTwentyFourHourTime(startTime.toLocaleTimeString())}`
-                        if (data.duel_type == 0) {
+                        if (data.player_type == 0) {
                             if (index == 0) {
                                 opponent = data[`user2_is_free`] ? 'free' : 'paid'
                             } else {

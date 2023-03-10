@@ -397,6 +397,8 @@ async function matchGeneralReport(reportType, dateFilter) {
         let p2mPlayPointsEarned = 0;
         let dailyRewardTrue = 0;
         let dailyRewardFalse = 0;
+        let daily2RewardTrue = 0;
+        let daily2RewardFalse = 0;
         let daily_reward_earned = 0;
         let dailyChargeReward = 0;
         let dailyMatchReward = 0;
@@ -408,6 +410,8 @@ async function matchGeneralReport(reportType, dateFilter) {
             p2mPlayPointsEarned += data.p2m_play_points_earned;
             dailyRewardTrue += data.daily_reward_true;
             dailyRewardFalse += data.daily_reward_false;
+            daily2RewardTrue += data.daily2_reward_true;
+            daily2RewardFalse += data.daily2_reward_false;
             daily_reward_earned += data.daily_reward_earned;
             dailyChargeReward += data.daily_charge_reward || 0;
             dailyMatchReward += data.daily_match_reward || 0;
@@ -420,6 +424,8 @@ async function matchGeneralReport(reportType, dateFilter) {
                 p2m_play_points_earned: p2mPlayPointsEarned,
                 daily_reward_true: dailyRewardTrue,
                 daily_reward_false: dailyRewardFalse,
+                daily2_reward_true: daily2RewardTrue,
+                daily2_reward_false: daily2RewardFalse,
                 daily_reward_earned: daily_reward_earned,
                 daily_charge_reward: dailyChargeReward,
                 daily_match_reward: dailyMatchReward
@@ -433,16 +439,18 @@ async function matchGeneralReport(reportType, dateFilter) {
         matchData.forEach(data => {
             tableBody += `
             <tr>
-             <td style="width: 10%;">${new Date(data.date).toLocaleDateString()}</td>
-             <td style="width: 10%;">${numberWithDot(data.p2p_play)}</td>
-             <td style="width: 10%;">${numberWithDot(data.p2p_play_points_earned)}</td>
-             <td style="width: 10%;">${numberWithDot(data.p2m_play)}</td>
-             <td style="width: 10%;">${numberWithDot(data.p2m_play_points_earned)}</td>
-             <td style="width: 10%;">${numberWithDot(data.daily_reward_earned)}</td>
-             <td style="width: 10%;">${numberWithDot(data.daily_charge_reward)}</td>
-             <td style="width: 10%;">${numberWithDot(data.daily_match_reward)}</td>
-             <td style="width: 10%;">${numberWithDot(data.daily_reward_true)}</td>
-             <td style="width: 10%;">${numberWithDot(data.daily_reward_false)}</td>
+             <td style="width: 8.3%;">${new Date(data.date).toLocaleDateString()}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.p2p_play)}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.p2p_play_points_earned)}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.p2m_play)}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.p2m_play_points_earned)}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.daily_reward_earned)}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.daily_charge_reward)}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.daily_match_reward)}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.daily_reward_true)}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.daily_reward_false)}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.daily2_reward_true)}</td>
+             <td style="width: 8.3%;">${numberWithDot(data.daily2_reward_false)}</td>
             </tr>`;
         });
         html = `
@@ -450,16 +458,18 @@ async function matchGeneralReport(reportType, dateFilter) {
          <table style="width: 100%; border-collapse: collapse;">
             <tbody>
             <tr>
-            <th style="width: 10%; text-align:left">Tarih</th>
-            <th style="width: 10%; text-align:left">P2P Oyun</th>
-            <th style="width: 10%; text-align:left">P2P Kazanılan Puan</th>
-            <th style="width: 10%; text-align:left">P2M Oyun</th>
-            <th style="width: 10%; text-align:left">P2M Kazanılan Puan</th>
-            <th style="width: 10%; text-align:left">Günlük Hakediş</th>
-            <th style="width: 10%; text-align:left">Ücretli Oyuna Katılım Ödülü</th>
-            <th style="width: 10%; text-align:left">Maç Sonu Kazanılan Ödül</th>
-            <th style="width: 10%; text-align:left">Günlük 1GB Başarılı</th>
-            <th style="width: 10%; text-align:left">Günlük 1GB Başarısız</th>
+            <th style="width: 8.3%; text-align:left">Tarih</th>
+            <th style="width: 8.3%; text-align:left">P2P Oyun</th>
+            <th style="width: 8.3%; text-align:left">P2P Kazanılan Puan</th>
+            <th style="width: 8.3%; text-align:left">P2M Oyun</th>
+            <th style="width: 8.3%; text-align:left">P2M Kazanılan Puan</th>
+            <th style="width: 8.3%; text-align:left">Günlük Hakediş</th>
+            <th style="width: 8.3%; text-align:left">Ücretli Oyuna Katılım Ödülü</th>
+            <th style="width: 8.3%; text-align:left">Maç Sonu Kazanılan Ödül</th>
+            <th style="width: 8.3%; text-align:left">Günlük 1GB Başarılı</th>
+            <th style="width: 8.3%; text-align:left">Günlük 1GB Başarısız</th>
+            <th style="width: 8.3%; text-align:left">Günlük 2GB Başarılı</th>
+            <th style="width: 8.3%; text-align:left">Günlük 2GB Başarısız</th>
             </tr>
            ${tableBody}
             </tbody>
@@ -470,45 +480,53 @@ async function matchGeneralReport(reportType, dateFilter) {
         <table style="width: 100%; border-collapse: collapse;">
             <tbody>
              <tr>
-                <td style="width: 12.5%;"></td>
-                <td style="width: 12.5%; font-weight: bold;">Oyun Sayısı</td>
-                <td style="width: 12.5%; font-weight: bold;">Kazanılan Puan</td>
-                <td style="width: 12.5%; font-weight: bold;">Günlük Hakediş</td>
-                <td style="width: 12.5%; font-weight: bold;">Ücretli Oyuna Katılım Ödülü</td>
-                <td style="width: 12.5%; font-weight: bold;">Maç Sonu Kazanılan Ödül</td>
-                <td style="width: 12.5%; font-weight: bold;">Günlük 1GB Başarılı</td>
-                <td style="width: 12.5%; font-weight: bold;">Günlük 1GB Başarısız</td>
+                <td style="width: 10%;"></td>
+                <td style="width: 10%; font-weight: bold;">Oyun Sayısı</td>
+                <td style="width: 10%; font-weight: bold;">Kazanılan Puan</td>
+                <td style="width: 10%; font-weight: bold;">Günlük Hakediş</td>
+                <td style="width: 10%; font-weight: bold;">Ücretli Oyuna Katılım Ödülü</td>
+                <td style="width: 10%; font-weight: bold;">Maç Sonu Kazanılan Ödül</td>
+                <td style="width: 10%; font-weight: bold;">Günlük 1GB Başarılı</td>
+                <td style="width: 10%; font-weight: bold;">Günlük 1GB Başarısız</td>
+                <td style="width: 10%; font-weight: bold;">Günlük 2GB Başarılı</td>
+                <td style="width: 10%; font-weight: bold;">Günlük 2GB Başarısız</td>
             </tr>
              <tr>
-                <td style="width: 12.5%; font-weight: bold;">P2P</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].p2p_play)}</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].p2p_play_points_earned)}</td>
-                <td style="width: 12.5%;">-</td>
-                <td style="width: 12.5%;">-</td>
-                <td style="width: 12.5%;">-</td>
-                <td style="width: 12.5%;">-</td>
-                <td style="width: 12.5%;">-</td>
+                <td style="width: 10%; font-weight: bold;">P2P</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].p2p_play)}</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].p2p_play_points_earned)}</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
             </tr>
             <tr>
-                <td style="width: 12.5%; font-weight: bold;">P2M</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].p2m_play)}</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].p2m_play_points_earned)}</td>
-                <td style="width: 12.5%;">-</td>
-                <td style="width: 12.5%;">-</td>
-                <td style="width: 12.5%;">-</td>
-                <td style="width: 12.5%;">-</td>
-                <td style="width: 12.5%;">-</td>
+                <td style="width: 10%; font-weight: bold;">P2M</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].p2m_play)}</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].p2m_play_points_earned)}</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
+                <td style="width: 10%;">-</td>
             </tr>
            <tr>
-                <td style="width: 12.5%; font-weight: bold;">Toplam</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].p2p_play + matchData[0].p2m_play)}</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].p2p_play_points_earned +
+                <td style="width: 10%; font-weight: bold;">Toplam</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].p2p_play + matchData[0].p2m_play)}</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].p2p_play_points_earned +
             matchData[0].p2m_play_points_earned)}</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].daily_reward_earned)}</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].daily_charge_reward || 0)}</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].daily_match_reward || 0)}</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].daily_reward_true)}</td>
-                <td style="width: 12.5%;">${numberWithDot(matchData[0].daily_reward_false)}</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].daily_reward_earned)}</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].daily_charge_reward || 0)}</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].daily_match_reward || 0)}</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].daily_reward_true)}</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].daily_reward_false)}</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].daily2_reward_true)}</td>
+                <td style="width: 10%;">${numberWithDot(matchData[0].daily2_reward_false)}</td>
             </tr>
             </tbody>
         </table>`;
@@ -707,7 +725,7 @@ async function chargeReport(reportType, dateFilter) {
         chargeData.reduce(function (res, value) {
             if (!res[value.error]) {
                 res[value.error] = {
-                    charge_amount: "5 TL",
+                    charge_amount: "12 TL",
                     status: value.status,
                     quantity: 0,
                     play_count: 0,

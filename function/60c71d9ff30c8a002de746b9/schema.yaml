@@ -2,7 +2,7 @@ _id: 60c71d9ff30c8a002de746b9
 name: Retry Reward
 description: Retry Reward  Function
 language: javascript
-timeout: 104
+timeout: 143.7
 triggers:
   checkReward:
     options:
@@ -17,26 +17,12 @@ triggers:
       preflight: true
     type: http
     active: true
-  test123:
-    options:
-      method: Get
-      path: /test2
-      preflight: true
-    type: http
-    active: true
   detectMissingAvailablePlay:
     options:
       timezone: Europe/Istanbul
       frequency: 0 * * * *
     type: schedule
     active: true
-  manualSetReward1:
-    options:
-      method: Get
-      path: /manualSetReward1
-      preflight: true
-    type: http
-    active: false
 env:
   PAST_MATCHES_BUCKET_ID: "{PAST_MATCHES_BUCKET_ID}"
   REWARD_BUCKET_ID: "{REWARD_BUCKET_ID}"

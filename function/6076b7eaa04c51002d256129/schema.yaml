@@ -2,7 +2,7 @@ _id: 6076b7eaa04c51002d256129
 name: 🎮 User Rank Index
 description: Finds user rank with devkit/database
 language: javascript
-timeout: 63
+timeout: 112.9
 triggers:
   getUserRank:
     options:
@@ -25,6 +25,13 @@ triggers:
       preflight: true
     type: http
     active: false
+  getLast3MonthsPlayUser:
+    options:
+      method: Get
+      path: /getLast3MonthsPlayUser
+      preflight: true
+    type: http
+    active: true
 env:
   SECRET_API_KEY: "{SECRET_API_KEY}"
   USER_BUCKET_ID: "{USER_BUCKET_ID}"

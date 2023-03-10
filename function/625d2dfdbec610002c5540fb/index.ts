@@ -11,7 +11,7 @@ export async function sendChargeRequest(change) {
     let target = change.document;
 
     if (target.status) {
-        let point = 100;
+        let point = 150;
 
         let obj = {
             "Service": "Duello",

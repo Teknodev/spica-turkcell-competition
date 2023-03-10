@@ -25,7 +25,8 @@ const REWARD_REPORT_BUCKET_ID = process.env.REWARD_REPORT_BUCKET_ID;
 const BUGGED_REWARD_BUCKET_ID = process.env.BUGGED_REWARD_BUCKET_ID;
 
 const DAILY_1GB_OFFER_ID = 451318;
-const CHARGE_AMOUNT = "5 TL";
+const DAILY_2GB_OFFER_ID = 455884;
+const CHARGE_AMOUNT = "12 TL";
 
 export async function executeReportDaily() {
     let date = new Date().setDate(new Date().getDate() - 1)
@@ -258,6 +259,30 @@ export async function matchReport(reportType, dateFrom, dateTo) {
         .count()
         .catch(err => console.log("ERROR: 54", err));
 
+    const rewardDaily2True = await rewardLogsCollection
+        .find({
+            offer_id: DAILY_2GB_OFFER_ID,
+            status: true,
+            date: {
+                $gte: dateFrom,
+                $lt: dateTo
+            }
+        })
+        .count()
+        .catch(err => console.log("ERROR: 53", err));
+
+    const rewardDaily2False = await buggedRewardsCollection
+        .find({
+            offer_id: DAILY_2GB_OFFER_ID,
+            status: false,
+            date: {
+                $gte: dateFrom,
+                $lt: dateTo
+            }
+        })
+        .count()
+        .catch(err => console.log("ERROR: 54", err));
+
     const rewardDailyMatchTrue = await rewardLogsCollection
         .find({
             offer_id: DAILY_1GB_OFFER_ID,
@@ -273,7 +298,7 @@ export async function matchReport(reportType, dateFrom, dateTo) {
 
     const rewardDailyChargeTrue = await rewardLogsCollection
         .find({
-            offer_id: DAILY_1GB_OFFER_ID,
+            offer_id: DAILY_2GB_OFFER_ID,
             status: true,
             type: 'charge',
             date: {
@@ -296,7 +321,9 @@ export async function matchReport(reportType, dateFrom, dateTo) {
             daily_reward_true: rewardDailyTrue,
             daily_reward_false: rewardDailyFalse,
             daily_reward_earned: daily_reward_earned,
-            report_type: reportType
+            report_type: reportType,
+            daily2_reward_true: rewardDaily2True,
+            daily2_reward_false: rewardDaily2False
         })
         .catch(err => console.log("ERROR: 27", err));
 
