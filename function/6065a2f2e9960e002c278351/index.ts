@@ -115,7 +115,7 @@ export async function matchmaker() {
         );
 
         // 3- change (time and) elo of unmatched ->> delete these users from ->> matchmaking bucket ->> insert updated users to ->> matchmaking bucket
-        let elo_iteration_width = configuration[0].value;
+        // let elo_iteration_width = configuration[0].value;
 
         // old delete-update-add method
         // let updated_unmatched_users = updateUnmatchedMatches(unmatched_with_bots, elo_iteration_width);
@@ -162,8 +162,8 @@ function createDuelObjectsWithUser(matchmaking_users) {
             user1_ready: false,
             user2_ready: false,
             created_at: current_date,
-            user1_is_free: matchmaking_user[0].user.free_play,
-            user2_is_free: matchmaking_user[1].user.free_play,
+            user1_is_free: !!!matchmaking_user[0].user.available_play_count,
+            user2_is_free: !!!matchmaking_user[1].user.available_play_count,
             duel_type: 0,
             user1_identity: matchmaking_user[0].user.identity,
             user2_identity: matchmaking_user[1].user.identity,
@@ -185,7 +185,7 @@ function createDuelObjectsWithBot(matchmaking_users, bot) {
             user1_ready: false,
             user2_ready: true,
             created_at: current_date,
-            user1_is_free: matchmaking_user.user.free_play,
+            user1_is_free: !!!matchmaking_user.user.available_play_count,
             user2_is_free: false,
             duel_type: 1,
             user1_identity: matchmaking_user.user.identity

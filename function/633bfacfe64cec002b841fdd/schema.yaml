@@ -1,7 +1,7 @@
 _id: 633bfacfe64cec002b841fdd
 name: Helper
 language: javascript
-timeout: 360
+timeout: 50.1
 triggers:
   replaceAbusiveName:
     type: schedule
@@ -9,7 +9,152 @@ triggers:
     options:
       timezone: UTC
       frequency: 0 * * * *
+  checkUserFreePlay:
+    options:
+      method: Post
+      path: /checkUserFreePlay
+      preflight: true
+    type: http
+    active: true
+  identityMigration:
+    options:
+      method: Get
+      path: /identityMigration
+      preflight: true
+    type: http
+    active: true
+  getChargeData:
+    options:
+      method: Get
+      path: /getChargeData
+      preflight: true
+    type: http
+    active: false
+  getGameLeagueUsers:
+    options:
+      method: Get
+      path: /getGameLeagueUsers
+      preflight: true
+    type: http
+    active: false
+  getGameLeagueSendedData:
+    options:
+      method: Get
+      path: /getGameLeagueSendedData
+      preflight: true
+    type: http
+    active: false
+  chargesData:
+    options:
+      method: Get
+      path: /chargesData
+      preflight: true
+    type: http
+    active: false
+  insertChargeCount:
+    options:
+      method: Post
+      path: /insertChargeCount
+      preflight: true
+    type: http
+    active: false
+  chargeCountRefactor:
+    options:
+      method: Get
+      path: /chargeCountRefactor
+      preflight: true
+    type: http
+    active: false
+  insertAllGameLeagueUsers:
+    options:
+      method: Post
+      path: /insertAllGameLeagueUsers
+      preflight: true
+    type: http
+    active: false
+  gameLeagueDataReport:
+    options:
+      method: Get
+      path: /gameLeagueDataReport
+      preflight: true
+    type: http
+    active: false
+  insertUniqueChargeData:
+    options:
+      method: Post
+      path: /insertUniqueChargeData
+      preflight: true
+    type: http
+    active: false
+  getUniquePlayer:
+    options:
+      method: Get
+      path: /getUniquePlayer
+      preflight: true
+    type: http
+    active: true
+  getMsisdnsFromBucket:
+    options:
+      method: Get
+      path: /getMsisdnsFromBucket
+      preflight: true
+    type: http
+    active: true
+  patchUsers:
+    options:
+      method: Get
+      path: /patchUsers
+      preflight: true
+    type: http
+    active: false
+  deleteManyTest:
+    options:
+      method: Get
+      path: /deleteManyTest
+      preflight: true
+    type: http
+    active: true
+  getUniqueCharge:
+    options:
+      method: Get
+      path: /getUniqueCharge
+      preflight: true
+    type: http
+    active: true
+  getTvpPlusRewardedNewUsers:
+    options:
+      method: Get
+      path: /getTvpPlusRewardedNewUsers
+      preflight: true
+    type: http
+    active: true
+  ozikoReport:
+    options:
+      method: Get
+      path: /ozikoReport
+      preflight: true
+    type: http
+    active: true
+  buggedUserDataOperation:
+    options:
+      method: Get
+      path: /buggedUserDataOperation
+      preflight: true
+    type: http
+    active: false
+  retrySystemReportOperations:
+    options:
+      method: Get
+      path: /retrySystemReportOperations
+      preflight: true
+    type: http
+    active: false
 env:
   USER_BUCKET: "{USER_BUCKET}"
   NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+  PAST_MATCHES_BUCKET: "{PAST_MATCHES_BUCKET}"
+  CHARGE_BUCKET: "{CHARGE_BUCKET}"
+  GAME_LEAGUE_PARTICIPANTS: "{GAME_LEAGUE_PARTICIPANTS}"
+  DRAW_LOGS: "{DRAW_LOGS}"
 memoryLimit: 100
+order: 18

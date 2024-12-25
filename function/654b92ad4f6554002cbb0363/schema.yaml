@@ -1,0 +1,65 @@
+_id: 654b92ad4f6554002cbb0363
+name: Game League
+language: javascript
+timeout: 60
+triggers:
+  onCharged:
+    type: database
+    active: false
+    options:
+      collection: bucket_60ab7235c03a2d002eb2f574
+      type: INSERT
+  getLeagueParticipantData:
+    options:
+      method: Get
+      path: /getLeagueParticipantData/:msisdn
+      preflight: true
+    type: http
+    active: false
+  insertFormData:
+    options:
+      method: Post
+      path: /insertFormData
+      preflight: true
+    type: http
+    active: false
+  getChargesByMsisdn:
+    options:
+      path: /game-league/get-charges
+      method: Post
+      preflight: true
+    type: http
+    active: false
+  sendDrawDataManually:
+    options:
+      method: Post
+      path: /manuallySendDrawLogsData
+      preflight: true
+    type: http
+    active: false
+  buggedUsersGet:
+    options:
+      method: Post
+      path: /buggedUsersGet
+      preflight: true
+    type: http
+    active: false
+  manuallySendDrawLog:
+    options:
+      method: Post
+      path: /manuallySendDrawLog
+      preflight: true
+    type: http
+    active: false
+  onChargedTvPlus:
+    options:
+      collection: bucket_60ab7235c03a2d002eb2f574
+      type: INSERT
+    type: database
+    active: false
+env:
+  DRAW_LOGS_BUCKET: "{DRAW_LOGS_BUCKET}"
+  CHARGE_BUCKET: "{CHARGE_BUCKET}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+  GAME_LEAGUE_PARTICIPANTS_BUCKET: "{GAME_LEAGUE_PARTICIPANTS_BUCKET}"
+memoryLimit: 100

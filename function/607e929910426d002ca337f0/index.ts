@@ -1,6 +1,7 @@
 import { database, close } from "@spica-devkit/database";
 import * as Bucket from "@spica-devkit/bucket";
 var jwt = require("jsonwebtoken");
+import * as Identity from "@spica-devkit/identity";
 
 const MATCHMAKING_BUCKET_ID = process.env.MATCHMAKING_BUCKET_ID;
 const USER_BUCKET_ID = process.env.USER_BUCKET_ID;
@@ -13,8 +14,8 @@ export async function addMatchMaking(req, res) {
     let token = getToken(req.headers.get("authorization"));
 
     // Bucket.initialize({ apikey: `${SECRET_API_KEY}` });
-    let token_object = tokenVerified(token);
-
+    let token_object = await tokenVerified(token);
+    
     if (token_object.error === false) {
         let decoded_token = token_object.decoded_token;
 
@@ -36,7 +37,7 @@ export async function addMatchMaking(req, res) {
         let user_object = await users_collection
             .findOne({ identity: decoded_token._id })
             .catch(err => console.log("ERROR 1", err));
-        
+                
         if (user_object._id == user) {
             // if (user_object.can_play) {
             if (user_object.available_play_count > 0 || user_object.free_play) {
@@ -88,25 +89,14 @@ function getToken(token) {
     return token;
 }
 
-function tokenVerified(token) {
-    /* -request object
-        error: true | false,
-        decoded_token: token
-     */
-
+async function tokenVerified(token) {
     let response_object = {
         error: false
     };
 
-    let decoded = "";
-
-    try {
-        decoded = jwt.verify(token, `${JWT_SECRET_KEY}`);
-
-        response_object.decoded_token = decoded;
-    } catch (err) {
-        response_object.error = true;
-    }
+    Identity.initialize({ apikey: `${SECRET_API_KEY}` });
+    const decoded = await Identity.verifyToken(token).catch(err => (response_object.error = true));
+    response_object.decoded_token = decoded;
 
     return response_object;
 }

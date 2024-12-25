@@ -43,5 +43,5 @@ properties:
     title: auto
 primary: title
 icon: outbond
-order: 2
+order: 8
 history: false

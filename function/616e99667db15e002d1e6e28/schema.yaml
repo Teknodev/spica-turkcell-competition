@@ -10,7 +10,16 @@ triggers:
       method: Post
       path: /changeName
       preflight: true
+  playCountDecrease:
+    options:
+      method: Post
+      path: /playCountDecrease
+      preflight: true
+    type: http
+    active: true
 env:
   SECRET_API_KEY: "{SECRET_API_KEY}"
   USER_BUCKET_ID: "{USER_BUCKET_ID}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
 memoryLimit: 100
+order: 19

@@ -2,6 +2,7 @@ import { database, ObjectId } from "@spica-devkit/database";
 import * as Bucket from "@spica-devkit/bucket";
 
 const PAST_MATCHES_BUCKET_ID = process.env.PAST_MATCHES_BUCKET_ID;
+const SINGLEPLAY_PAST_MATCHES_BUCKET_ID = process.env.SINGLEPLAY_PAST_MATCHES_BUCKET_ID;
 const REWARD_BUCKET_ID = process.env.REWARD_BUCKET_ID;
 const CHARGE_BUCKET_ID = process.env.CHARGE_BUCKET_ID;
 const USER_BUCKET_ID = process.env.USER_BUCKET_ID;
@@ -161,6 +162,7 @@ async function retryTcellIssues() {
     buggedRewards = buggedRewards.filter(
         reward => !manuallyRewards.find(mr => mr.retry_id == reward._id.toString())
     );
+    const logData = [];
     for (let reward of buggedRewards) {
         let retryCount = await rewardsCollection.find({
             $and: [
@@ -170,12 +172,18 @@ async function retryTcellIssues() {
             ]
         }).toArray();
         if (retryCount.length < 24) {
+            logData.push({
+                msisdn: reward.msisdn.substring(2),
+            })
             insertReward(
                 reward.msisdn.substring(2),
-                reward.offer_id == DAILY_2GB_OFFER_ID ? "daily_2" : "daily_1",
+                "daily_1", 
                 reward._id
             );
         }
+    }
+    if (logData.length) {
+        console.log("logData: ", logData)
     }
 }
 
@@ -273,7 +281,7 @@ export async function detectMissingAvailablePlay() {
         db = await database().catch(err => console.log("ERROR 16 ", err));
     }
 
-    const pastMatchesCollection = db.collection(`bucket_${PAST_MATCHES_BUCKET_ID}`);
+    const pastMatchesCollection = db.collection(`bucket_${SINGLEPLAY_PAST_MATCHES_BUCKET_ID}`);
     const chargeCollection = db.collection(`bucket_${CHARGE_BUCKET_ID}`);
     const usersCollection = db.collection(`bucket_${USER_BUCKET_ID}`);
     const playCountCollection = db.collection(`bucket_${PLAY_COUNT_LOGS_BUCKET_ID}`);
@@ -318,45 +326,45 @@ export async function detectMissingAvailablePlay() {
         .toArray()
         .catch(err => console.log("ERROR 18", err));
 
-    let user1Paid = await pastMatchesCollection
+    let userMatches = await pastMatchesCollection
         .aggregate([
-            { $match: { start_time: { $gte: minDate, $lte: matchMaxDate }, user1_is_free: false } },
-            { $group: { _id: "$user1", count: { $sum: 1 } } }
+            { $match: { start_time: { $gte: minDate, $lte: matchMaxDate }, user_is_free: false } },
+            { $group: { _id: "$user", count: { $sum: 1 } } }
         ])
         .toArray()
         .catch(err => console.log("ERROR 19", err));
 
-    let user2Paid = await pastMatchesCollection
-        .aggregate([
-            {
-                $match: {
-                    start_time: { $gte: minDate, $lte: matchMaxDate },
-                    user2_is_free: false,
-                    player_type: 0
-                }
-            },
-            { $group: { _id: "$user2", count: { $sum: 1 } } }
-        ])
-        .toArray()
-        .catch(err => console.log("ERROR 20", err));
+    // let user2Paid = await pastMatchesCollection
+    //     .aggregate([
+    //         {
+    //             $match: {
+    //                 start_time: { $gte: minDate, $lte: matchMaxDate },
+    //                 user2_is_free: false,
+    //                 player_type: 0
+    //             }
+    //         },
+    //         { $group: { _id: "$user2", count: { $sum: 1 } } }
+    //     ])
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 20", err));
 
-    let concatedMatches = user1Paid.concat(user2Paid);
+    // let concatedMatches = user1Paid.concat(user2Paid);
 
-    concatedMatches.reduce(function (res, value) {
-        if (!res[value._id]) {
-            res[value._id] = {
-                _id: value._id,
-                count: 0
-            };
-            uniqueMatches.push(res[value._id]);
-        }
-        res[value._id].count += value.count;
-        return res;
-    }, {});
+    // concatedMatches.reduce(function (res, value) {
+    //     if (!res[value._id]) {
+    //         res[value._id] = {
+    //             _id: value._id,
+    //             count: 0
+    //         };
+    //         uniqueMatches.push(res[value._id]);
+    //     }
+    //     res[value._id].count += value.count;
+    //     return res;
+    // }, {});
 
     users.forEach(user => {
         let userIdeentity = identities.find(identity => String(identity._id) == user.identity);
-        let userMatch = uniqueMatches.find(userMatch => userMatch._id == String(user._id));
+        let userMatch = userMatches.find(userMatch => userMatch._id == String(user._id));
         userIdeentity ? (user["msisdn"] = userIdeentity.attributes.msisdn) : undefined;
         userMatch ? (user["match_count"] = userMatch.count) : undefined;
     });

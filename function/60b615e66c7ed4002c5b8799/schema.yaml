@@ -9,22 +9,17 @@ triggers:
       collection: bucket_605ca275e9960e002c2781a4
       type: INSERT
     type: database
-    active: true
-    batch:
-      deadline: 270
-      limit: 9007199254740991
+    active: false
   checkPastMatch:
     options:
-      timezone: Europe/Istanbul
       frequency: "* * * * *"
+      timezone: Europe/Istanbul
     type: schedule
-    active: true
-    batch:
-      deadline: 270
-      limit: 9007199254740991
+    active: false
 env:
   DUEL_BUCKET_ID: "{DUEL_BUCKET_ID}"
   ALERT_BUCKET_ID: "{ALERT_BUCKET_ID}"
   PAST_MATCHES_BUCKET_ID: "{PAST_MATCHES_BUCKET_ID}"
   NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
 memoryLimit: 100
+order: 15

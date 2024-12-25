@@ -1,0 +1,55 @@
+_id: 65aa9f23066ea8002b18bac8
+title: All Game League Users
+description: Describe your new bucket
+icon: view_stream
+primary: msisdn
+readOnly: false
+history: false
+properties:
+  msisdn:
+    type: string
+    title: msisdn
+    description: Description of the msisdn input
+    options:
+      position: bottom
+      index: true
+  name:
+    type: string
+    title: name
+    description: Description of the name input
+    options:
+      position: bottom
+  surname:
+    type: string
+    title: surname
+    description: Description of the surname input
+    options:
+      position: bottom
+  date_of_birth:
+    type: date
+    title: date_of_birth
+    description: Description of the date_of_birth input
+    options:
+      position: bottom
+  address:
+    type: textarea
+    title: address
+    description: Description of the address input
+    options:
+      position: bottom
+  city:
+    type: string
+    title: city
+    description: Description of the city input
+    options:
+      position: bottom
+  created_at:
+    type: date
+    title: created_at
+    description: Description of the created_at input
+    options:
+      position: bottom
+acl:
+  write: true==true
+  read: true==true
+order: 45

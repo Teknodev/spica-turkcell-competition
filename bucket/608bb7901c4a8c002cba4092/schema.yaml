@@ -79,20 +79,19 @@ properties:
     options:
       position: bottom
     default: 0
-  daily2_reward_true:
+  free_reward_true:
     type: number
-    title: daily2_reward_true
-    description: Description of the daily2_reward_true input
+    title: free_reward_true
+    description: Description of the free_reward_true input
     options:
       position: bottom
-    default: 0
-  daily2_reward_false:
+  free_reward_false:
     type: number
-    title: daily2_reward_false
-    description: Description of the daily2_reward_false input
+    title: free_reward_false
+    description: Description of the free_reward_false input
     options:
       position: bottom
 acl:
   write: true==true
   read: true==true
-order: 19
+order: 26

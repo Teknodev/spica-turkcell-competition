@@ -59,27 +59,3 @@ export async function detectError(req, res) {
 
     return res.status(200).send(data)
 }
-
-export async function manuallySendDrawFn(req, res) {
-    const db = await database().catch(err => console.log("ERROR 1", err));
-    const charge_collection = db.collection(`bucket_60ab7235c03a2d002eb2f574`);
-
-    const chargeData = await charge_collection.find({ date: { $gte: new Date("04-19-2022 09:00:0"), $lt: new Date("04-19-2022 14:17:00") }, status: true }).toArray().catch(err => console.log("ERROR 1", err));
-    console.log("chargeData", chargeData.length)
-
-    const result = [];
-    chargeData.forEach((el) => {
-        result.push(
-            {
-                "Service": "Duello",
-                "OfferId": 4689,
-                "Action": "Payment",
-                "Msisdn": el.msisdn,
-                "ChargeId": String(el._id),
-                "Point": 100,
-                "ChargeDate": el.date
-            }
-        )
-    })
-    return { result }
-}

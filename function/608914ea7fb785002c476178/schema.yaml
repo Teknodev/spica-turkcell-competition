@@ -57,7 +57,7 @@ triggers:
       path: tcellprovisioning
       preflight: true
     type: http
-    active: true
+    active: false
   testProvisionTcell:
     options:
       method: Get
@@ -72,6 +72,13 @@ triggers:
       preflight: true
     type: http
     active: true
+  newUserSetAward:
+    options:
+      method: Post
+      path: /newUserSetAward
+      preflight: true
+    type: http
+    active: true
 env:
   USER_BUCKET_ID: "{USER_BUCKET_ID}"
   JWT_SECRET_KEY: "{JWT_SECRET_KEY}"
@@ -81,3 +88,4 @@ env:
   NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
   BUGGED_REWARDS_BUCKET_ID: "{BUGGED_REWARDS_BUCKET_ID}"
 memoryLimit: 100
+order: 12

@@ -1,0 +1,40 @@
+_id: 673611a93a38ee002c0aae35
+name: Singleplay
+language: javascript
+timeout: 60
+triggers:
+  singleplayPastMatchOperation:
+    options:
+      bucket: 6710f35280e61c002b556a69
+      type: INSERT
+    type: bucket
+    active: true
+  getWinnerSingleplay:
+    options:
+      collection: bucket_670e66f480e61c002b3e5a56
+      type: INSERT
+    type: database
+    active: true
+  deleteFinishedDuels:
+    options:
+      timezone: UTC
+      frequency: "* * * * *"
+    type: schedule
+    active: true
+  buggedUsersHandle:
+    options:
+      timezone: UTC
+      frequency: 0 0 * * *
+    type: schedule
+    active: true
+env:
+  SINGLEPLAY_PAST_MATCHES: "{SINGLEPLAY_PAST_MATCHES}"
+  CORRUPTED_SINGLEPLAY_PAST_MATCHES: "{CORRUPTED_SINGLEPLAY_PAST_MATCHES}"
+  USER_BUCKET: "{USER_BUCKET}"
+  SINGLEPLAY_DUEL_QUEUE: "{SINGLEPLAY_DUEL_QUEUE}"
+  SINGLEPLAY_DUEL_COUNT: "{SINGLEPLAY_DUEL_COUNT}"
+  SINGLEPLAY_BUGGED_GAMES: "{SINGLEPLAY_BUGGED_GAMES}"
+  REWARDS_BUCKET_ID: "{REWARDS_BUCKET_ID}"
+  BUGGED_REWARDS_BUCKET_ID: "{BUGGED_REWARDS_BUCKET_ID}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+memoryLimit: 100

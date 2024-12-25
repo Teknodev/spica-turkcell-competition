@@ -25,5 +25,5 @@ properties:
     title: file
 primary: file
 icon: outbond
-order: 3
+order: 9
 history: false

@@ -15,23 +15,27 @@ const BUGGED_REWARDS_BUCKET_ID = process.env.BUGGED_REWARDS_BUCKET_ID;
 const TCELL_USERNAME = 400026758;
 const TCELL_PASSWORD = 400026758;
 const MT_VARIANT = 130524;
-const CHARGE_VARIANT = 154641;
-const CHARGE_OFFER_ID = 498341;
-const DAILY_1GB_OFFER_ID = 451318;
-const DAILY_2GB_OFFER_ID = 455884;
 
-const DAILY_CAMPAIGN_ID = "871137.947567.966243";
-const DAILY_2GB_CAMPAIGN_ID = "1236";
+const CHARGE_VARIANT = 207340; //182108 todo!
+const CHARGE_OFFER_ID = 627443; //559635 todo!
+
+const DAILY_1GB_OFFER_ID = 481642; //451318 changed
+const DAILY_CAMPAIGN_ID = 1236; //"871137.947567.966243" changed
+//const DAILY_2GB_OFFER_ID = 455884; Unused
+//const DAILY_2GB_CAMPAIGN_ID = "1236"; Unused
 
 const CHARGE_REWARD_CHANNEl_ID = 23;
+const CHARGE_AMOUNT = "35 TL"; //todo !
 
-const CHARGE_AMOUNT = "12 TL";
+const HOURLY_1GB_OFFER_ID = 451319;//added
+const HOURLY_CAMPAIGN_ID = "871137.947568.966245"; //added
+
 
 let db;
 
 export async function addAvailablePlay(req, res) {
     let token = getToken(req.headers.get("authorization"));
-    let token_object = tokenVerified(token);
+    let token_object = await tokenVerified(token);
 
     if (token_object.error === false) {
         let generatedCode = codeGenerate(4);
@@ -82,7 +86,7 @@ export async function addAvailablePlay(req, res) {
 }
 
 export async function sendSms(receiverMsisdn, code) {
-    let message = `Sifreniz: ${code}. Kodu ekrana girerek vergiler dahil ${CHARGE_AMOUNT} karsiliginda GNC Duello oyunundan Gunluk 2 GB kazanacaksiniz. Oyunu kazanirsaniz ek olarak Gunluk 1 GB daha kazanacaksiniz. Basarilar!`;
+    let message = `Sifreniz: ${code}. Kodu ekrana girerek vergiler dahil ${CHARGE_AMOUNT} karsiliginda Duello oyunundan Gunluk 1 GB kazanacaksiniz. Oyunu kazanirsaniz ek olarak Gunluk 1 GB daha kazanacaksiniz. Basarilar!`;
     let shortNumber = 3757;
 
     const sessionId = await sessionSOAP(TCELL_USERNAME, TCELL_PASSWORD, MT_VARIANT).catch(err =>
@@ -123,9 +127,9 @@ export async function sendSms(receiverMsisdn, code) {
             })
             .then(res => {
                 let result = JSON.parse(convert.xml2json(res.data, { compact: true, spaces: 4 }));
-                updateConfirmationCode(result["env:Envelope"]["env:Body"]["sdp:SendSMSOutput"], receiverMsisdn, code)
+                updateConfirmationCode(result["S:Envelope"]["S:Body"]["sdp:SendSMSOutput"], receiverMsisdn, code)
                 let statusCode =
-                    result["env:Envelope"]["env:Body"]["sdp:SendSMSOutput"]["so:TSOresult"][
+                    result["S:Envelope"]["S:Body"]["sdp:SendSMSOutput"]["so:TSOresult"][
                     "so:statusCode"
                     ]["_text"];
                 if (parseInt(statusCode) == 0) return true;
@@ -358,20 +362,14 @@ function getToken(token) {
     return token;
 }
 
-function tokenVerified(token) {
+async function tokenVerified(token) {
     let response_object = {
         error: false
     };
 
-    let decoded = "";
-
-    try {
-        decoded = jwt.verify(token, `${JWT_SECRET_KEY}`);
-
-        response_object.decoded_token = decoded;
-    } catch (err) {
-        response_object.error = true;
-    }
+    Identity.initialize({ apikey: `${SECRET_API_KEY}` });
+    const decoded = await Identity.verifyToken(token).catch(err => (response_object.error = true));
+    response_object.decoded_token = decoded;
 
     return response_object;
 }
@@ -424,14 +422,14 @@ async function setAward(msisdns, winnerIndex, usersPlayType, matchId) {
         // at the beginning of the game
         if (msisdns[winnerIndex]) {
             if (usersPlayType[winnerIndex]) {
-                await setAwardSOAP(
-                    sessionId,
-                    msisdns[winnerIndex],
-                    DAILY_1GB_OFFER_ID,
-                    DAILY_CAMPAIGN_ID,
-                    matchId,
-                    'match'
-                ).catch(err => console.log("ERROR 16", err));
+                // await setAwardSOAP(
+                //     sessionId,
+                //     msisdns[winnerIndex],
+                //     HOURLY_1GB_OFFER_ID,
+                //     HOURLY_CAMPAIGN_ID,
+                //     matchId,
+                //     'match'
+                // ).catch(err => console.log("ERROR 16", err));
             }
             // winner award
             else {
@@ -599,7 +597,7 @@ export async function checkSMSCode(req, res) {
     }
     const confirmationCodeCollection = db.collection(`bucket_${CONFIRMATION_CODE_BUCKET_ID}`);
     let token = getToken(req.headers.get("authorization"));
-    let token_object = tokenVerified(token);
+    let token_object = await tokenVerified(token);
     if (token_object.error === false) {
         let decoded_token = token_object.decoded_token;
         return await confirmationCodeCollection
@@ -658,9 +656,9 @@ export async function charge(msisdn, identity) {
         identity
     ).catch(err => console.log("ERROR 33", err));
     // const transactionRes = false;
-
+    console.log("transactionRes :",transactionRes)
     if (transactionRes.status) {
-        await setAwardSOAP(sessionId, msisdn, DAILY_2GB_OFFER_ID, DAILY_2GB_CAMPAIGN_ID, '', 'charge', CHARGE_REWARD_CHANNEl_ID).catch(err =>
+        await setAwardSOAP(sessionId, msisdn, DAILY_1GB_OFFER_ID, DAILY_CAMPAIGN_ID, '', 'charge', CHARGE_REWARD_CHANNEl_ID).catch(err =>
             console.log("ERROR 20", err)
         );
 
@@ -710,12 +708,12 @@ export async function applyRewardManually(change) {
             matchID,
             'manual'
         ).catch(err => console.log("ERROR 36", err));
-    } else if (change.current.reward == "daily_2") {
+    } else if (change.current.reward == "hourly_1") {
         result = await setAwardSOAP(
             sessionId,
             change.current.msisdn,
-            DAILY_2GB_OFFER_ID,
-            DAILY_2GB_CAMPAIGN_ID,
+            HOURLY_1GB_OFFER_ID,
+            HOURLY_CAMPAIGN_ID,
             matchID,
             'manual'
         ).catch(err => console.log("ERROR 37", err));
@@ -738,28 +736,28 @@ export async function testManChargeAndReward(req, res) {
     // msisdn = 5322101428;
     // msisdn = "3467524304";
     // msisdn = "5354513340"
-    // let msisdn = "5317828001"
-    let msisdn = "5354513340"
+    let msisdn = "5317828001"
+    // let msisdn = "5354513340"
     // let msisdn = "5384359362"
     
 
-    let TEST_CHARGE_VARIANT = 154641;
-    let TEST_CHARGE_OFFER_ID = 498341;
+    let TEST_CHARGE_VARIANT = 181764;//changed
+    let TEST_CHARGE_OFFER_ID = 559052;//changed
     let TEST_DAILY_2GB_OFFER_ID = 455884;
 
-    // const sessionId = await sessionSOAP(TCELL_USERNAME, TCELL_PASSWORD, TEST_CHARGE_VARIANT).catch(err =>
-    //     console.log("ERROR 32", err)
-    // );
-    // const transactionRes = await testOfferTransactionSOAP(
-    //     sessionId,
-    //     msisdn,
-    //     TEST_CHARGE_OFFER_ID
-    // ).catch(err => console.log("ERROR 33", err));
+    const sessionId = await sessionSOAP(TCELL_USERNAME, TCELL_PASSWORD, TEST_CHARGE_VARIANT).catch(err =>
+        console.log("ERROR 32", err)
+    );
+    const transactionRes = await testOfferTransactionSOAP(
+        sessionId,
+        msisdn,
+        TEST_CHARGE_OFFER_ID
+    ).catch(err => console.log("ERROR 33", err));
     
     await tetsSetAwardSOAP("sessionId", msisdn, TEST_DAILY_2GB_OFFER_ID, '1236', '', 'charge').catch(err =>
         console.log("ERROR 20", err)
     );
-
+    console.log("transactionRes: ",transactionRes);
     return res.status(200).send({ message: 'ok' })
 }
 
@@ -982,4 +980,25 @@ async function testOfferTransactionSOAP(sessionID, msisdn, offerId, identity) {
         });
 
     return transactionRes;
+}
+
+export async function newUserSetAward(req, res) {
+    const { msisdn, matchId } = req.body
+    console.log("NewUser: ", msisdn, matchId);
+    const sessionId = await sessionSOAP(TCELL_USERNAME, TCELL_PASSWORD, CHARGE_VARIANT).catch(err =>
+        console.log("ERROR 15", err)
+    );
+    if (sessionId) {
+        await setAwardSOAP(
+            sessionId,
+            msisdn,
+            DAILY_1GB_OFFER_ID,
+            DAILY_CAMPAIGN_ID,
+            matchId,
+            'newUserMatch'
+        ).catch(err => console.log("ERROR 17", err));
+
+        return res.status(200).send({ message: 'Award set successfull' });
+    } else return res.status(400).send({ message: 'Award set unsuccessfull' });
+
 }

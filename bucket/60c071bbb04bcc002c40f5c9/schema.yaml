@@ -49,5 +49,5 @@ properties:
     default: 0
 primary: created_at
 icon: outbond
-order: 1
+order: 7
 history: false

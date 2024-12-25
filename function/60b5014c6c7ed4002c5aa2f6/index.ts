@@ -15,7 +15,7 @@ const CONFIGURATION_BUCKET_ID = process.env.CONFIGURATION_BUCKET_ID;
 const BUGGED_REWARDS_BUCKET_ID = process.env.BUGGED_REWARDS_BUCKET_ID;
 const DELETED_MATCHES_BUCKET_ID = process.env.DELETED_MATCHES_BUCKET_ID;
 
-const CHARGE_AMOUNT = '12 TL';
+const CHARGE_AMOUNT = '20 TL';
 
 let db;
 export async function matchChart(req, res) {

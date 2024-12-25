@@ -20,3 +20,4 @@ triggers:
 env:
   AUTH_APIKEY: "{AUTH_APIKEY}"
 memoryLimit: 100
+order: 8

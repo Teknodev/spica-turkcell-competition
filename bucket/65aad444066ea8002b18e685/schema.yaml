@@ -1,0 +1,25 @@
+_id: 65aad444066ea8002b18e685
+title: Unique Charge Counts
+description: Describe your new bucket
+icon: view_stream
+primary: msisdn
+readOnly: false
+history: false
+properties:
+  msisdn:
+    type: string
+    title: msisdn
+    description: Description of the msisdn input
+    options:
+      position: bottom
+      index: false
+  total_charge_count:
+    type: number
+    title: total_charge_count
+    description: Description of the total_charge_count input
+    options:
+      position: bottom
+acl:
+  write: true==true
+  read: true==true
+order: 46

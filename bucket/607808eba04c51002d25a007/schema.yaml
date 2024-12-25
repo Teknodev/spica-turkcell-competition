@@ -79,4 +79,4 @@ acl:
     auth._id == "60a431c7a334b8002d50775e" ||
     auth.attributes.role == "admin"
   read: true == true
-order: 12
+order: 19

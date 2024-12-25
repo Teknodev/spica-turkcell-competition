@@ -2,6 +2,7 @@ import * as Bucket from "@spica-devkit/bucket";
 import { database, close, ObjectId } from "@spica-devkit/database";
 const fetch = require("node-fetch");
 var jwt = require("jsonwebtoken");
+import * as Identity from "@spica-devkit/identity";
 
 const DUEL_BUCKET_ID = process.env.DUEL_BUCKET_ID;
 const USER_BUCKET_ID = process.env.USER_BUCKET_ID;
@@ -11,7 +12,7 @@ const QUESTION_BUCKET_ID = process.env.QUESTION_BUCKET_ID;
 const OPTIONS_BUCKET_ID = process.env.OPTIONS_BUCKET_ID;
 
 const SECRET_API_KEY = process.env.SECRET_API_KEY;
-const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+
 
 let db;
 
@@ -23,7 +24,7 @@ export async function nextQuestion(req, res) {
     // token
     let token = getToken(req.headers.get("authorization"));
 
-    let token_object = tokenVerified(token);
+    let token_object = await tokenVerified(token);
 
     // token verified or not
     if (token_object.error == false) {
@@ -87,26 +88,37 @@ export async function nextQuestion(req, res) {
     }
 }
 
-function tokenVerified(token) {
-    /* -request object
-        error: true | false,
-        decoded_token: token
-     */
+// function tokenVerified(token) {
+//     /* -request object
+//         error: true | false,
+//         decoded_token: token
+//      */
 
+//     let response_object = {
+//         error: false
+//     };
+
+//     let decoded = "";
+
+//     try {
+//         decoded = jwt.verify(token, `${JWT_SECRET_KEY}`);
+
+//         response_object.decoded_token = decoded;
+//     } catch (err) {
+//         console.log("error", err);
+//         response_object.error = true;
+//     }
+
+//     return response_object;
+// }
+async function tokenVerified(token) {
     let response_object = {
         error: false
     };
 
-    let decoded = "";
-
-    try {
-        decoded = jwt.verify(token, `${JWT_SECRET_KEY}`);
-
-        response_object.decoded_token = decoded;
-    } catch (err) {
-        console.log("error", err);
-        response_object.error = true;
-    }
+    Identity.initialize({ apikey: `${SECRET_API_KEY}` });
+    const decoded = await Identity.verifyToken(token).catch(err => (response_object.error = true));
+    response_object.decoded_token = decoded;
 
     return response_object;
 }
@@ -186,6 +198,7 @@ async function getQuestionWithOptions(duel) {
         .collection(`bucket_${CONFIGURATION_BUCKET_ID}`)
         .findOne({ key: "question_level_system" })
         .catch(err => console.log("ERROR 19: ", err));
+    
     /*
     let configuration = await Bucket.data
         .getAll(`${CONFIGURATION_BUCKET_ID}`, {
@@ -193,13 +206,13 @@ async function getQuestionWithOptions(duel) {
         })
         .then(data => data[0]);
     */
-
+    
     let duel_answers = await db
         .collection(`bucket_${DUEL_ANSWERS_BUCKET_ID}`)
         .find({ duel: duel._id.toString() })
         .toArray()
         .catch(err => console.log("ERROR 20: ", err));
-
+    
     let question_level = JSON.parse(configuration.value);
     let required_level = getRequiredLevel(question_level, duel_answers);
     // let required_level = 1;
@@ -247,10 +260,10 @@ async function getQuestionWithOptions(duel) {
             .find({ question: question._id.toString() })
             .toArray()
             .catch(err => console.log("ERROR 22: ", err));
-
+        
         options = manipulateOptions(options);
     }
-
+    
     return {
         question_id: question._id.toString(),
         options: options

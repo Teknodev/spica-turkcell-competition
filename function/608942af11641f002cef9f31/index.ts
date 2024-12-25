@@ -17,6 +17,8 @@ const CHARGE_REPORT_BUCKET_ID = process.env.CHARGE_REPORT_BUCKET_ID;
 const USERS_MATCH_REPORT_BUCKET_ID = process.env.USERS_MATCH_REPORT_BUCKET_ID;
 const WIN_LOSE_MATCHES_BUCKET_ID = process.env.WIN_LOSE_MATCHES_BUCKET_ID;
 const ANSWERS_TO_QUESTION_REPORT_BUCKET_ID = process.env.ANSWERS_TO_QUESTION_REPORT_BUCKET_ID;
+const SINGLEPLAY_PAST_MATCHES = process.env.SINGLEPLAY_PAST_MATCHES;
+
 
 const PLAY_COUNT_LOGS_BUCKET_ID = process.env.PLAY_COUNT_LOGS_BUCKET_ID;
 const MANUALLY_REWARD_BUCKET_ID = process.env.MANUALLY_REWARD_BUCKET_ID;
@@ -24,25 +26,28 @@ const RETRY_REPORT_BUCKET_ID = process.env.RETRY_REPORT_BUCKET_ID;
 const REWARD_REPORT_BUCKET_ID = process.env.REWARD_REPORT_BUCKET_ID;
 const BUGGED_REWARD_BUCKET_ID = process.env.BUGGED_REWARD_BUCKET_ID;
 
-const DAILY_1GB_OFFER_ID = 451318;
-const DAILY_2GB_OFFER_ID = 455884;
-const CHARGE_AMOUNT = "12 TL";
+const DAILY_1GB_OFFER_ID = 481642; //451318 changed
+const HOURLY_1GB_OFFER_ID = 451319;
+// const DAILY_2GB_OFFER_ID = 455884;
+const CHARGE_AMOUNT = "35 TL";
 
 export async function executeReportDaily() {
     let date = new Date().setDate(new Date().getDate() - 1)
     let dateFrom = new Date(date).setHours(0, 0, 0);
     let dateTo = new Date(date).setHours(23, 59, 59);
 
-    await questionReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 1", err));
-    await userReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 4", err));
-    await playedMatchCount(0, dateFrom, dateTo).catch(err => console.log("ERROR: 49", err));
-    await matchReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 2", err));
-    await matchWinLoseCount(0, dateFrom, dateTo).catch(err => console.log("ERROR: 55", err));
-    await chargeReportExport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 3", err));
-    await retryReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
-    await getFailedRewards(0, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
+    await Promise.all([
+        // questionReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 1", err)),
+        userReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 2", err)),
+        playedMatchCount(0, dateFrom, dateTo).catch(err => console.log("ERROR: 3", err)),
+        matchReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 4", err)),
+        matchWinLoseCount(0, dateFrom, dateTo).catch(err => console.log("ERROR: 5", err)),
+        chargeReportExport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 6", err)),
+        retryReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 7", err)),
+        getFailedRewards(0, dateFrom, dateTo).catch(err => console.log("ERROR: 8", err)),
+    ])
 
-    await reportExportSend("Günlük Rapor", 0).catch(err => console.log("ERROR: 5", err));
+    await reportExportSend("Günlük Rapor", 0).catch(err => console.log("ERROR: 10", err));
 
     return true;
 }
@@ -71,6 +76,7 @@ export async function questionReport(reportType, dateFrom, dateTo) {
     let reportDate = new Date().setDate(new Date().getDate() - 1)
 
     const db = await database().catch(err => console.log("ERROR: 16", err));
+
     const pastMatchesCollection = db.collection(`bucket_${PAST_MATCHES_BUCKET_ID}`);
     const questionCollection = db.collection(`bucket_${QUESTION_BUCKET_ID}`);
     const questionReportCollection = db.collection(`bucket_${QUESTION_REPORT_BUCKET_ID}`);
@@ -218,6 +224,7 @@ export async function matchReport(reportType, dateFrom, dateTo) {
         .toArray()
         .catch(err => console.log("ERROR: 24", err));
 
+
     p2pMatches.forEach(match => {
         if (match.winner == 1 || match.winner == 2) {
             daily_reward_earned += 3
@@ -236,7 +243,7 @@ export async function matchReport(reportType, dateFrom, dateTo) {
     p2mMatchCount = p2mMatches.length;
 
     const rewardDailyTrue = await rewardLogsCollection
-        .find({
+        .countDocuments({
             offer_id: DAILY_1GB_OFFER_ID,
             status: true,
             date: {
@@ -244,11 +251,10 @@ export async function matchReport(reportType, dateFrom, dateTo) {
                 $lt: dateTo
             }
         })
-        .count()
         .catch(err => console.log("ERROR: 53", err));
 
     const rewardDailyFalse = await buggedRewardsCollection
-        .find({
+        .countDocuments({
             offer_id: DAILY_1GB_OFFER_ID,
             status: false,
             date: {
@@ -256,35 +262,32 @@ export async function matchReport(reportType, dateFrom, dateTo) {
                 $lt: dateTo
             }
         })
-        .count()
         .catch(err => console.log("ERROR: 54", err));
 
-    const rewardDaily2True = await rewardLogsCollection
-        .find({
-            offer_id: DAILY_2GB_OFFER_ID,
+    const rewardFreeTrue = await rewardLogsCollection
+        .countDocuments({
+            offer_id: HOURLY_1GB_OFFER_ID,
             status: true,
             date: {
                 $gte: dateFrom,
                 $lt: dateTo
             }
         })
-        .count()
         .catch(err => console.log("ERROR: 53", err));
 
-    const rewardDaily2False = await buggedRewardsCollection
-        .find({
-            offer_id: DAILY_2GB_OFFER_ID,
+    const rewardFreeFalse = await buggedRewardsCollection
+        .countDocuments({
+            offer_id: HOURLY_1GB_OFFER_ID,
             status: false,
             date: {
                 $gte: dateFrom,
                 $lt: dateTo
             }
         })
-        .count()
         .catch(err => console.log("ERROR: 54", err));
 
     const rewardDailyMatchTrue = await rewardLogsCollection
-        .find({
+        .countDocuments({
             offer_id: DAILY_1GB_OFFER_ID,
             status: true,
             type: 'match',
@@ -293,12 +296,11 @@ export async function matchReport(reportType, dateFrom, dateTo) {
                 $lt: dateTo
             }
         })
-        .count()
         .catch(err => console.log("ERROR", err));
 
     const rewardDailyChargeTrue = await rewardLogsCollection
-        .find({
-            offer_id: DAILY_2GB_OFFER_ID,
+        .countDocuments({
+            offer_id: DAILY_1GB_OFFER_ID,
             status: true,
             type: 'charge',
             date: {
@@ -306,7 +308,6 @@ export async function matchReport(reportType, dateFrom, dateTo) {
                 $lt: dateTo
             }
         })
-        .count()
         .catch(err => console.log("ERROR", err));
 
     await matchReportCollection
@@ -322,8 +323,8 @@ export async function matchReport(reportType, dateFrom, dateTo) {
             daily_reward_false: rewardDailyFalse,
             daily_reward_earned: daily_reward_earned,
             report_type: reportType,
-            daily2_reward_true: rewardDaily2True,
-            daily2_reward_false: rewardDaily2False
+            free_reward_true: rewardFreeTrue,
+            free_reward_false: rewardFreeFalse
         })
         .catch(err => console.log("ERROR: 27", err));
 
@@ -351,108 +352,134 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         })
     })
 
+    const [chargesSuccessful, error1, error2, error3, error4, error5, error6, error7] = await Promise.all([
+        chargesCollection
+            .countDocuments({ date: { $gte: dateFrom, $lt: dateTo }, status: true })
+            .catch(err => console.log("ERROR 41: ", err)),
+        chargesCollection
+            .countDocuments({ date: { $gte: dateFrom, $lt: dateTo }, status: false, user_text: "Devam eden diğer işlemlerden dolayı Oyun aboneliği gerçekleştirilememektedir." })
+            .catch(err => console.log("ERROR 42: ", err)),
+        chargesCollection
+            .countDocuments({ date: { $gte: dateFrom, $lt: dateTo }, status: false, user_text: "Abone kredisi(bakiyesi) yetersiz." })
+            .catch(err => console.log("ERROR 43: ", err)),
+        chargesCollection
+            .countDocuments({ date: { $gte: dateFrom, $lt: dateTo }, status: false, user_text: "Abone bulunamadi." })
+            .catch(err => console.log("ERROR 44: ", err)),
+        chargesCollection
+            .countDocuments({ date: { $gte: dateFrom, $lt: dateTo }, status: false, user_text: "Abone kara listede islem yapilamaz." })
+            .catch(err => console.log("ERROR 45: ", err)),
+        chargesCollection.countDocuments({ date: { $gte: dateFrom, $lt: dateTo }, status: false, user_text: "Hattiniz Katma Degerli Servis aboneligine kapali oldugu icin Oyun servisine abonelik talebiniz gerceklestirilememistir. Abonelik izninizi 532?yi arayarak actirabilirsiniz." })
+            .catch(err => console.log("ERROR 46: ", err)),
+        chargesCollection
+            .countDocuments({ date: { $gte: dateFrom, $lt: dateTo }, status: false, user_text: "Rahat Hatlar bu servisten yararlanamazlar." })
+            .catch(err => console.log("ERROR 47: ", err)),
+        chargesCollection
+            .countDocuments({ date: { $gte: dateFrom, $lt: dateTo }, status: false, user_text: "Sistemlerde oluşan hata sebebi ile işleminiz yapılamıyor. İşleminiz tekrar denenmek üzere kuyruğa atılmıştır." })
+            .catch(err => console.log("ERROR 48: ", err))
 
-    const chargesSuccessful = await chargesCollection
-        .find({ date: { $gte: dateFrom, $lt: dateTo }, status: true })
-        .toArray()
-        .catch(err => console.log("ERROR 41: ", err));
+    ])
 
-    const error1 = await chargesCollection
-        .find({
-            date: { $gte: dateFrom, $lt: dateTo },
-            status: false,
-            user_text:
-                "Devam eden diğer işlemlerden dolayı GNC Oyun aboneliği gerçekleştirilememektedir."
-        })
-        .toArray()
-        .catch(err => console.log("ERROR 42: ", err));
+    // const chargesSuccessful = await chargesCollection
+    //     .find({ date: { $gte: dateFrom, $lt: dateTo }, status: true })
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 41: ", err));
 
-    const error2 = await chargesCollection
-        .find({
-            date: { $gte: dateFrom, $lt: dateTo },
-            status: false,
-            user_text: "Abone kredisi(bakiyesi) yetersiz."
-        })
-        .toArray()
-        .catch(err => console.log("ERROR 43: ", err));
+    // const error1 = await chargesCollection
+    //     .find({
+    //         date: { $gte: dateFrom, $lt: dateTo },
+    //         status: false,
+    //         user_text:
+    //             "Devam eden diğer işlemlerden dolayı Oyun aboneliği gerçekleştirilememektedir."
+    //     })
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 42: ", err));
 
-    const error3 = await chargesCollection
-        .find({
-            date: { $gte: dateFrom, $lt: dateTo },
-            status: false,
-            user_text: "Abone bulunamadi."
-        })
-        .toArray()
-        .catch(err => console.log("ERROR 44: ", err));
+    // const error2 = await chargesCollection
+    //     .find({
+    //         date: { $gte: dateFrom, $lt: dateTo },
+    //         status: false,
+    //         user_text: "Abone kredisi(bakiyesi) yetersiz."
+    //     })
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 43: ", err));
 
-    const error4 = await chargesCollection
-        .find({
-            date: { $gte: dateFrom, $lt: dateTo },
-            status: false,
-            user_text: "Abone kara listede islem yapilamaz."
-        })
-        .toArray()
-        .catch(err => console.log("ERROR 45: ", err));
+    // const error3 = await chargesCollection
+    //     .find({
+    //         date: { $gte: dateFrom, $lt: dateTo },
+    //         status: false,
+    //         user_text: "Abone bulunamadi."
+    //     })
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 44: ", err));
 
-    const error5 = await chargesCollection
-        .find({
-            date: { $gte: dateFrom, $lt: dateTo },
-            status: false,
-            user_text:
-                "Hattiniz Katma Degerli Servis aboneligine kapali oldugu icin GNC Oyun servisine abonelik talebiniz gerceklestirilememistir. Abonelik izninizi 532?yi arayarak actirabilirsiniz."
-        })
-        .toArray()
-        .catch(err => console.log("ERROR 46: ", err));
-    const error6 = await chargesCollection
-        .find({
-            date: { $gte: dateFrom, $lt: dateTo },
-            status: false,
-            user_text: "Rahat Hatlar bu servisten yararlanamazlar."
-        })
+    // const error4 = await chargesCollection
+    //     .find({
+    //         date: { $gte: dateFrom, $lt: dateTo },
+    //         status: false,
+    //         user_text: "Abone kara listede islem yapilamaz."
+    //     })
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 45: ", err));
 
-        .toArray()
-        .catch(err => console.log("ERROR 47: ", err));
+    // const error5 = await chargesCollection
+    //     .find({
+    //         date: { $gte: dateFrom, $lt: dateTo },
+    //         status: false,
+    //         user_text:
+    //             "Hattiniz Katma Degerli Servis aboneligine kapali oldugu icin Oyun servisine abonelik talebiniz gerceklestirilememistir. Abonelik izninizi 532?yi arayarak actirabilirsiniz."
+    //     })
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 46: ", err));
+    // const error6 = await chargesCollection
+    //     .find({
+    //         date: { $gte: dateFrom, $lt: dateTo },
+    //         status: false,
+    //         user_text: "Rahat Hatlar bu servisten yararlanamazlar."
+    //     })
 
-    const error7 = await chargesCollection
-        .find({
-            date: { $gte: dateFrom, $lt: dateTo },
-            status: false,
-            user_text:
-                "Sistemlerde oluşan hata sebebi ile işleminiz yapılamıyor. İşleminiz tekrar denenmek üzere kuyruğa atılmıştır."
-        })
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 47: ", err));
 
-        .toArray()
-        .catch(err => console.log("ERROR 48: ", err));
+    // const error7 = await chargesCollection
+    // .find({
+    //     date: { $gte: dateFrom, $lt: dateTo },
+    //     status: false,
+    //     user_text:
+    //         "Sistemlerde oluşan hata sebebi ile işleminiz yapılamıyor. İşleminiz tekrar denenmek üzere kuyruğa atılmıştır."
+    // })
 
-    let totalQuantity = chargesSuccessful.length + error1.length + error2.length + error3.length + error4.length + error5.length + error6.length + error7.length;
+    // .toArray()
+    // .catch(err => console.log("ERROR 48: ", err));
+
+    let totalQuantity = chargesSuccessful + error1 + error2 + error3 + error4 + error5 + error6 + error7;
 
     const datas = [
         {
             date: new Date(reportDate),
             charge_amount: CHARGE_AMOUNT,
-            quantity: chargesSuccessful.length,
-            ratio: chargesSuccessful.length ? Number(((chargesSuccessful.length / totalQuantity) * 100).toFixed(2)) : 0,
+            quantity: chargesSuccessful,
+            ratio: chargesSuccessful ? Number(((chargesSuccessful / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarılı",
-            play_count: chargesSuccessful.length - missingPlayCount,
+            play_count: chargesSuccessful - missingPlayCount,
             error: "-",
             report_type: reportType
         },
         {
             date: new Date(reportDate),
             charge_amount: CHARGE_AMOUNT,
-            quantity: error1.length,
-            ratio: error1.length ? Number(((error1.length / totalQuantity) * 100).toFixed(2)) : 0,
+            quantity: error1,
+            ratio: error1 ? Number(((error1 / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error:
-                "Devam eden diğer işlemlerden dolayı GNC Oyun aboneliği gerçekleştirilememektedir.",
+                "Devam eden diğer işlemlerden dolayı Oyun aboneliği gerçekleştirilememektedir.",
             report_type: reportType
         },
         {
             date: new Date(reportDate),
             charge_amount: CHARGE_AMOUNT,
-            quantity: error2.length,
-            ratio: error2.length ? Number(((error2.length / totalQuantity) * 100).toFixed(2)) : 0,
+            quantity: error2,
+            ratio: error2 ? Number(((error2 / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error: "Abone kredisi(bakiyesi) yetersiz.",
@@ -461,8 +488,8 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         {
             date: new Date(reportDate),
             charge_amount: CHARGE_AMOUNT,
-            quantity: error3.length,
-            ratio: error3.length ? Number(((error3.length / totalQuantity) * 100).toFixed(2)) : 0,
+            quantity: error3,
+            ratio: error3 ? Number(((error3 / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error: "Abone bulunamadi.",
@@ -471,8 +498,8 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         {
             date: new Date(reportDate),
             charge_amount: CHARGE_AMOUNT,
-            quantity: error4.length,
-            ratio: error4.length ? Number(((error4.length / totalQuantity) * 100).toFixed(2)) : 0,
+            quantity: error4,
+            ratio: error4 ? Number(((error4 / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error: "Abone kara listede islem yapilamaz.",
@@ -481,19 +508,19 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         {
             date: new Date(reportDate),
             charge_amount: CHARGE_AMOUNT,
-            quantity: error5.length,
-            ratio: error5.length ? Number(((error5.length / totalQuantity) * 100).toFixed(2)) : 0,
+            quantity: error5,
+            ratio: error5 ? Number(((error5 / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error:
-                "Hattiniz Katma Degerli Servis aboneligine kapali oldugu icin GNC Oyun servisine abonelik talebiniz gerceklestirilememistir. Abonelik izninizi 532?yi arayarak actirabilirsiniz.",
+                "Hattiniz Katma Degerli Servis aboneligine kapali oldugu icin Oyun servisine abonelik talebiniz gerceklestirilememistir. Abonelik izninizi 532?yi arayarak actirabilirsiniz.",
             report_type: reportType
         },
         {
             date: new Date(reportDate),
             charge_amount: CHARGE_AMOUNT,
-            quantity: error6.length,
-            ratio: error6.length ? Number(((error6.length / totalQuantity) * 100).toFixed(2)) : 0,
+            quantity: error6,
+            ratio: error6 ? Number(((error6 / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error: "Rahat Hatlar bu servisten yararlanamazlar.",
@@ -502,8 +529,8 @@ export async function chargeReportExport(reportType, dateFrom, dateTo) {
         {
             date: new Date(reportDate),
             charge_amount: CHARGE_AMOUNT,
-            quantity: error7.length,
-            ratio: error7.length ? Number(((error7.length / totalQuantity) * 100).toFixed(2)) : 0,
+            quantity: error7,
+            ratio: error7 ? Number(((error7 / totalQuantity) * 100).toFixed(2)) : 0,
             status: "Başarısız",
             play_count: "-",
             error:
@@ -528,13 +555,12 @@ export async function userReport(reportType, dateFrom, dateTo) {
 
     const usersCount = await usersCollection.count();
     const newUsersCount = await usersCollection
-        .find({
+        .countDocuments({
             created_at: {
                 $gte: dateFrom,
                 $lt: dateTo
             }
         })
-        .count()
         .catch(err => console.log("ERROR: 32", err));
 
     await userReportCollection
@@ -556,119 +582,171 @@ async function playedMatchCount(reportType, dateFrom, dateTo) {
     let reportDate = new Date().setDate(new Date().getDate() - 1)
 
     const db = await database().catch(err => console.log("ERROR 38", err));
-    const pastMatchesCollection = db.collection(`bucket_${PAST_MATCHES_BUCKET_ID}`);
+    const pastMatchesCollection = db.collection(`bucket_${SINGLEPLAY_PAST_MATCHES}`);
     const userMatchCollection = db.collection(`bucket_${USERS_MATCH_REPORT_BUCKET_ID}`);
 
-    let user1Paid = await pastMatchesCollection
-        .aggregate([
-            { $match: { end_time: { $gte: dateFrom, $lt: dateTo }, user1_is_free: false } },
-            { $group: { _id: "$user1" } }
-        ])
-        .toArray()
-        .catch(err => console.log("ERROR 39", err));
+    const [
+        paidMatches,
+        freeMatches,
+        paidUserCount,
+        freeUserCount
+    ] = await Promise.all([
+        pastMatchesCollection.countDocuments({
+            end_time: { $gte: dateFrom, $lt: dateTo },
+            user_is_free: false
+        }),
+        pastMatchesCollection.countDocuments({
+            end_time: { $gte: dateFrom, $lt: dateTo },
+            user_is_free: true
+        }),
+        pastMatchesCollection
+            .distinct("user", {
+                end_time: { $gte: dateFrom, $lt: dateTo },
+                user_is_free: false
+            })
+            .then(users => users.length)
+            .catch(err => {
+                console.log("ERROR 39 - Paid Users", err);
+                return 0;
+            }),
+        pastMatchesCollection
+            .distinct("user", {
+                end_time: { $gte: dateFrom, $lt: dateTo },
+                user_is_free: true
+            })
+            .then(users => users.length)
+            .catch(err => {
+                console.log("ERROR 39 - Free Users", err);
+                return 0;
+            })
+    ]);
+    // let paidUsers = await pastMatchesCollection
+    //     .aggregate([
+    //         { $match: { end_time: { $gte: dateFrom, $lt: dateTo }, user_is_free: false } },
+    //         { $group: { _id: "$user" } }
+    //     ])
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 39", err));
 
-    let user2Paid = await pastMatchesCollection
-        .aggregate([
-            {
-                $match: {
-                    end_time: { $gte: dateFrom, $lt: dateTo },
-                    player_type: 0,
-                    user2_is_free: false
-                }
-            },
-            { $group: { _id: "$user2" } }
-        ])
-        .toArray()
-        .catch(err => console.log("ERROR 40", err));
+    // let freeUsers = await pastMatchesCollection
+    //     .aggregate([
+    //         { $match: { end_time: { $gte: dateFrom, $lt: dateTo }, user_is_free: true } },
+    //         { $group: { _id: "$user" } }
+    //     ])
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 39", err));
 
-    let user1Free = await pastMatchesCollection
-        .aggregate([
-            { $match: { end_time: { $gte: dateFrom, $lt: dateTo }, user1_is_free: true } },
-            { $group: { _id: "$user1" } }
-        ])
-        .toArray()
-        .catch(err => console.log("ERROR 41", err));
 
-    let user2Free = await pastMatchesCollection
-        .aggregate([
-            {
-                $match: {
-                    end_time: { $gte: dateFrom, $lt: dateTo },
-                    player_type: 0,
-                    user2_is_free: true
-                }
-            },
-            { $group: { _id: "$user1" } }
-        ])
-        .toArray()
-        .catch(err => console.log("ERROR 42", err));
+    // let user1Paid = await pastMatchesCollection
+    //     .aggregate([
+    //         { $match: { end_time: { $gte: dateFrom, $lt: dateTo }, user1_is_free: false } },
+    //         { $group: { _id: "$user1" } }
+    //     ])
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 39", err));
 
-    const paidvsPaidP2P = await pastMatchesCollection
-        .find({
-            player_type: 0,
-            user1_is_free: false,
-            user2_is_free: false,
-            end_time: { $gte: dateFrom, $lt: dateTo }
-        })
-        .count()
-        .catch(err => console.log("ERROR 43", err));
+    // let user2Paid = await pastMatchesCollection
+    //     .aggregate([
+    //         {
+    //             $match: {
+    //                 end_time: { $gte: dateFrom, $lt: dateTo },
+    //                 player_type: 0,
+    //                 user2_is_free: false
+    //             }
+    //         },
+    //         { $group: { _id: "$user2" } }
+    //     ])
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 40", err));
 
-    const freevsPaidP2P = await pastMatchesCollection
-        .find({
-            player_type: 0,
-            $or: [
-                { user1_is_free: false, user2_is_free: true },
-                { user1_is_free: true, user2_is_free: false }
-            ],
-            end_time: { $gte: dateFrom, $lt: dateTo }
-        })
-        .count()
-        .catch(err => console.log("ERROR 44", err));
+    // let user1Free = await pastMatchesCollection
+    //     .aggregate([
+    //         { $match: { end_time: { $gte: dateFrom, $lt: dateTo }, user1_is_free: true } },
+    //         { $group: { _id: "$user1" } }
+    //     ])
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 41", err));
 
-    const paidvsBot = await pastMatchesCollection
-        .find({
-            player_type: 1,
-            user1_is_free: false,
-            end_time: { $gte: dateFrom, $lt: dateTo }
-        })
-        .count()
-        .catch(err => console.log("ERROR 45", err));
+    // let user2Free = await pastMatchesCollection
+    //     .aggregate([
+    //         {
+    //             $match: {
+    //                 end_time: { $gte: dateFrom, $lt: dateTo },
+    //                 player_type: 0,
+    //                 user2_is_free: true
+    //             }
+    //         },
+    //         { $group: { _id: "$user1" } }
+    //     ])
+    //     .toArray()
+    //     .catch(err => console.log("ERROR 42", err));
 
-    const freevsFreeP2P = await pastMatchesCollection
-        .find({
-            player_type: 0,
-            user1_is_free: true,
-            user2_is_free: true,
-            end_time: { $gte: dateFrom, $lt: dateTo }
-        })
-        .count()
-        .catch(err => console.log("ERROR 46", err));
+    // const paidvsPaidP2P = await pastMatchesCollection
+    //     .find({
+    //         player_type: 0,
+    //         user1_is_free: false,
+    //         user2_is_free: false,
+    //         end_time: { $gte: dateFrom, $lt: dateTo }
+    //     })
+    //     .count()
+    //     .catch(err => console.log("ERROR 43", err));
 
-    const freevsBot = await pastMatchesCollection
-        .find({
-            player_type: 1,
-            user1_is_free: true,
-            end_time: { $gte: dateFrom, $lt: dateTo }
-        })
-        .count()
-        .catch(err => console.log("ERROR 47", err));
+    // const freevsPaidP2P = await pastMatchesCollection
+    //     .find({
+    //         player_type: 0,
+    //         $or: [
+    //             { user1_is_free: false, user2_is_free: true },
+    //             { user1_is_free: true, user2_is_free: false }
+    //         ],
+    //         end_time: { $gte: dateFrom, $lt: dateTo }
+    //     })
+    //     .count()
+    //     .catch(err => console.log("ERROR 44", err));
 
-    user1Paid = user1Paid.map(el => el._id);
-    user2Paid = user2Paid.map(el => el._id);
-    user1Free = user1Free.map(el => el._id);
-    user2Free = user2Free.map(el => el._id);
-    let paid = [...new Set([...user1Paid, ...user2Paid])];
-    let free = [...new Set([...user1Free, ...user2Free])];
-    paid = paid.length;
-    free = free.length;
+    // const paidvsBot = await pastMatchesCollection
+    //     .find({
+    //         player_type: 1,
+    //         user1_is_free: false,
+    //         end_time: { $gte: dateFrom, $lt: dateTo }
+    //     })
+    //     .count()
+    //     .catch(err => console.log("ERROR 45", err));
+
+    // const freevsFreeP2P = await pastMatchesCollection
+    //     .find({
+    //         player_type: 0,
+    //         user1_is_free: true,
+    //         user2_is_free: true,
+    //         end_time: { $gte: dateFrom, $lt: dateTo }
+    //     })
+    //     .count()
+    //     .catch(err => console.log("ERROR 46", err));
+
+    // const freevsBot = await pastMatchesCollection
+    //     .find({
+    //         player_type: 1,
+    //         user1_is_free: true,
+    //         end_time: { $gte: dateFrom, $lt: dateTo }
+    //     })
+    //     .count()
+    //     .catch(err => console.log("ERROR 47", err));
+
+    // user1Paid = user1Paid.map(el => el._id);
+    // user2Paid = user2Paid.map(el => el._id);
+    // user1Free = user1Free.map(el => el._id);
+    // user2Free = user2Free.map(el => el._id);
+    // let paid = [...new Set([...user1Paid, ...user2Paid])];
+    // let free = [...new Set([...user1Free, ...user2Free])];
+    // paid = paid.length;
+    // free = free.length;
 
     await userMatchCollection
         .insertOne({
             date: new Date(reportDate),
-            paid_player: paid,
-            free_player: free,
-            paid_play_total: paidvsPaidP2P * 2 + freevsPaidP2P + paidvsBot,
-            free_play_total: freevsFreeP2P * 2 + freevsPaidP2P + freevsBot,
+            paid_player: paidUserCount,
+            free_player: freeUserCount,
+            paid_play_total: paidMatches,
+            free_play_total: freeMatches,
             report_type: reportType
         })
         .catch(err => console.log("ERROR 48", err));
@@ -682,48 +760,76 @@ async function matchWinLoseCount(reportType, dateFrom, dateTo) {
     let reportDate = new Date().setDate(new Date().getDate() - 1)
 
     const db = await database().catch(err => console.log("ERROR 50", err));
-    const pastMatchesCollection = db.collection(`bucket_${PAST_MATCHES_BUCKET_ID}`);
+    const pastMatchesCollection = db.collection(`bucket_${SINGLEPLAY_PAST_MATCHES}`);
     const winLoseCollection = db.collection(`bucket_${WIN_LOSE_MATCHES_BUCKET_ID}`);
 
-    let freeWin = await pastMatchesCollection
-        .find({
+    const freeWin = await pastMatchesCollection
+        .countDocuments({
             end_time: { $gte: dateFrom, $lt: dateTo },
-            $or: [
-                { user1_is_free: true, winner: 1 },
-                { user2_is_free: true, winner: 2, player_type: 0 }
-            ]
+            user_is_free: true,
+            is_win: true
         })
-        .count();
 
-    let freeLose = await pastMatchesCollection
-        .find({
+    const freeLose = await pastMatchesCollection
+        .countDocuments({
             end_time: { $gte: dateFrom, $lt: dateTo },
-            $or: [
-                { user1_is_free: true, winner: 2 },
-                { user2_is_free: true, winner: 1, player_type: 0 }
-            ]
+            user_is_free: true,
+            is_win: false
         })
-        .count();
 
-    let paidWin = await pastMatchesCollection
-        .find({
+    const paidWin = await pastMatchesCollection
+        .countDocuments({
             end_time: { $gte: dateFrom, $lt: dateTo },
-            $or: [
-                { user1_is_free: false, winner: 1 },
-                { user2_is_free: false, winner: 2, player_type: 0 }
-            ]
+            user_is_free: false,
+            is_win: true
         })
-        .count();
 
-    let paidLose = await pastMatchesCollection
-        .find({
+    const paidLose = await pastMatchesCollection
+        .countDocuments({
             end_time: { $gte: dateFrom, $lt: dateTo },
-            $or: [
-                { user1_is_free: false, winner: 2 },
-                { user2_is_free: false, winner: 1, player_type: 0 }
-            ]
+            user_is_free: false,
+            is_win: false
         })
-        .count();
+
+    // let freeWin = await pastMatchesCollection
+    //     .find({
+    //         end_time: { $gte: dateFrom, $lt: dateTo },
+    //         $or: [
+    //             { user1_is_free: true, winner: 1 },
+    //             { user2_is_free: true, winner: 2, player_type: 0 }
+    //         ]
+    //     })
+    //     .count();
+
+    // let freeLose = await pastMatchesCollection
+    //     .find({
+    //         end_time: { $gte: dateFrom, $lt: dateTo },
+    //         $or: [
+    //             { user1_is_free: true, winner: 2 },
+    //             { user2_is_free: true, winner: 1, player_type: 0 }
+    //         ]
+    //     })
+    //     .count();
+
+    // let paidWin = await pastMatchesCollection
+    //     .find({
+    //         end_time: { $gte: dateFrom, $lt: dateTo },
+    //         $or: [
+    //             { user1_is_free: false, winner: 1 },
+    //             { user2_is_free: false, winner: 2, player_type: 0 }
+    //         ]
+    //     })
+    //     .count();
+
+    // let paidLose = await pastMatchesCollection
+    //     .find({
+    //         end_time: { $gte: dateFrom, $lt: dateTo },
+    //         $or: [
+    //             { user1_is_free: false, winner: 2 },
+    //             { user2_is_free: false, winner: 1, player_type: 0 }
+    //         ]
+    //     })
+    //     .count();
 
     await winLoseCollection
         .insertOne({
@@ -749,10 +855,17 @@ export async function reportExportSend(title, reportType) {
             template: "report-mail",
             variables: `{"title": "${title}"}`,
             emails: [
-                "idriskaribov@gmail.com",
+                "emre.akatin@turkcell.com.tr",
                 "serdar@polyhagency.com",
                 "caglar@polyhagency.com",
-                "murat.malci@turkcell.com.tr"
+                "asli.bayram@turkcell.com.tr",
+                "tarik.dervis@turkcell.com.tr",
+                "murat.malci@turkcell.com.tr",
+                "ozkan.hakan@turkcell.com.tr",
+                "Pinar.koca@turkcell.com.tr",
+                "ozangol@teknodev.biz",
+                "serkan@polyhagency.com",
+                "batuhanevirgen@teknodev.biz"
             ],
             report_type: reportType
         })
@@ -854,9 +967,9 @@ export async function getFailedRewards(reportType, dateFrom, dateTo) {
 
 export async function executeReportMonthlyMan() {
     console.log("@mounthly-report")
-    // await reportExportSend("Aylık Gün Bazlı Rapor Güncel", 22).catch(err =>
-    //     console.log("ERROR: 163", err)
-    // );
+    await reportExportSend("Aylık Gün Bazlı Rapor Güncel", 22).catch(err =>
+        console.log("ERROR: 163", err)
+    );
     await reportExportSend("Aylık Toplam Rapor Güncel", 2).catch(err =>
         console.log("ERROR: 163", err)
     );
@@ -898,12 +1011,19 @@ export async function matchChargeCountList(req, res) {
 }
 
 export async function executeReportDailyMan(req, res) {
-    // let date1 = new Date();
-    // let date2 = new Date();
-    // let dateFrom = date1.setHours(date1.getHours() - 34);
-    // let dateTo = date2.setHours(date2.getHours() - 10);
+    let date = new Date().setDate(new Date().getDate() - 1)
+    let dateFrom = new Date(date).setHours(0, 0, 0);
+    let dateTo = new Date(date).setHours(23, 59, 59);
 
-    // await questionReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 1", err));
+    await Promise.all([
+        userReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 4", err)),
+        playedMatchCount(0, dateFrom, dateTo).catch(err => console.log("ERROR: 49", err)),
+        matchReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 2", err)),
+        matchWinLoseCount(0, dateFrom, dateTo).catch(err => console.log("ERROR: 55", err)),
+        chargeReportExport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 3", err)),
+        retryReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: ", err)),
+        getFailedRewards(0, dateFrom, dateTo).catch(err => console.log("ERROR: ", err))
+    ])
     // await userReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 4", err));
     // await playedMatchCount(0, dateFrom, dateTo).catch(err => console.log("ERROR: 49", err));
     // await matchReport(0, dateFrom, dateTo).catch(err => console.log("ERROR: 2", err));
@@ -914,7 +1034,8 @@ export async function executeReportDailyMan(req, res) {
 
     await reportExportSend("Günlük Rapor", 0).catch(err => console.log("ERROR: 5", err));
 
-    return res.status(200).send({ message: 'ok' });
+    return res.status(200).send({ message: 'ok' })
+
 }
 
 export async function executeReportWeeklyMan(req, res) {
@@ -932,7 +1053,7 @@ export async function executeReportWeeklyMan(req, res) {
     // await retryReport(1, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
     // await getFailedRewards(1, dateFrom, dateTo).catch(err => console.log("ERROR: ", err));
 
-    // await reportExportSend("Haftalık Toplam Rapor", 1).catch(err => console.log("ERROR: 63", err));
+    await reportExportSend("Haftalık Toplam Rapor", 1).catch(err => console.log("ERROR: 63", err));
     await reportExportSend("Haftalık Gün Bazlı Rapor", 11).catch(err =>
         console.log("ERROR: 63", err)
     );

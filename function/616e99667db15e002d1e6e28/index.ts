@@ -59,7 +59,7 @@ export async function setDatas(req, res) {
 
     const collection = db.collection(`policies`);
     // const col = await collection.find().toArray().catch(err => console.log("ERROR", err))
-    
+
 
     for (let el of data) {
         el._id = ObjectId(el._id)
@@ -68,4 +68,41 @@ export async function setDatas(req, res) {
     }
 
     return res.status(200).send(true)
+}
+
+export async function playCountDecrease(req, res) {
+    console.log("req: ", req);
+    const { userId } = req.body;
+    console.log("userId: ", userId);
+
+    if (!db) {
+        db = await database().catch(err => console.log("ERROR 30", err));
+    }
+
+    let token = getToken(req.headers.get("authorization"));
+    let token_object = await tokenVerified(token);
+
+    const userCollection = db.collection(`bucket_${USER_BUCKET_ID}`);
+
+    if (token_object.error === false) {
+        let setQuery = {}
+        const user = await userCollection.findOne({ _id: ObjectId(userId) }).catch(err => {
+            console.log("ERROR 1 ", err)
+        })
+
+        setQuery = {
+            available_play_count: Math.max(
+                user.available_play_count - 1,
+                0
+            )
+        }
+
+        await userCollection.updateOne({ _id: ObjectId(userId) }, {
+            $set: setQuery
+        }).catch(err => console.log("ERROR 2 ", err))
+
+        return res.status(200).send({ message: "successful" });
+    } else {
+        return res.status(400).send({ message: "Token is not verified." });
+    }
 }

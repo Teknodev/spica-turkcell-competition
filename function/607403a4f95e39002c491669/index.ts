@@ -121,7 +121,7 @@ export async function checkAFK(change) {
                 if (duelAnswer.length == 0 || user1_is_afk) {
                     duelInfo.user1_answer = "";
                     await fetch(
-                        "https://competition-tcell-7c537.hq.spicaengine.com/api/fn-execute/answerQuestion",
+                        "https://turkcell-competition-fea47.hq.spicaengine.com/api/fn-execute/answerQuestion",
                         {
                             method: "post",
                             body: JSON.stringify({
@@ -151,7 +151,7 @@ export async function checkAFK(change) {
                 if (duelAnswer.length == 0 || user2_is_afk) {
                     duelInfo.user2_answer = "";
                     await fetch(
-                        "https://competition-tcell-7c537.hq.spicaengine.com/api/fn-execute/answerQuestion",
+                        "https://turkcell-competition-fea47.hq.spicaengine.com/api/fn-execute/answerQuestion",
                         {
                             method: "post",
                             body: JSON.stringify({

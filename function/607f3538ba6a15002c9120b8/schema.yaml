@@ -11,29 +11,27 @@ triggers:
       preflight: true
     type: http
     active: true
-    batch:
-      deadline: 55
-      limit: 9007199254740991
   register:
     options:
-      method: Post
       path: /fastRegister
+      method: Post
       preflight: true
     type: http
     active: true
-    batch:
-      deadline: 55
-      limit: 9007199254740991
-  changePassword:
+  testSeamlessTokenValidate:
     options:
       method: Get
-      path: /changePassword
+      path: /testSeamlessTokenValidate
       preflight: true
     type: http
     active: true
-    batch:
-      deadline: 55
-      limit: 9007199254740991
+  getMyIp:
+    options:
+      method: Get
+      path: /getMyIp
+      preflight: true
+    type: http
+    active: true
 env:
   FASTLOGIN_SECRET_KEY: "{FASTLOGIN_SECRET_KEY}"
   FASTLOGIN_SERVICE_ID: "{FASTLOGIN_SERVICE_ID}"
@@ -42,4 +40,6 @@ env:
   USER_BUCKET_ID: "{USER_BUCKET_ID}"
   PASSWORD_SALT: "{PASSWORD_SALT}"
   NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+  TCELL_ADMIN_BUCKET_INSERT_APIKEY: "{TCELL_ADMIN_BUCKET_INSERT_APIKEY}"
 memoryLimit: 100
+order: 11

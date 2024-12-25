@@ -1,0 +1,17 @@
+_id: 67224d5d875584002cdcfea7
+name: Singleplay Question Selection
+language: javascript
+timeout: 60
+triggers:
+  getQuestions:
+    options:
+      method: Get
+      path: /getQuestions
+      preflight: true
+    type: http
+    active: true
+env:
+  QUESTION_BUCKET_ID: "{QUESTION_BUCKET_ID}"
+  OPTIONS_BUCKET_ID: "{OPTIONS_BUCKET_ID}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+memoryLimit: 100

@@ -76,6 +76,7 @@ properties:
     description: This field indicates the type of players. (0 - P2P / 1 - P2M)
     options:
       position: bottom
+      index: true
     default: 0
     minimum: 0
     maximum: 1
@@ -103,7 +104,26 @@ properties:
       index: true
     default: false
     readOnly: false
+  is_success:
+    type: boolean
+    title: is_success
+    description: Description of the is_success input
+    options:
+      position: bottom
+    default: false
+  marketing_request:
+    type: string
+    title: marketing_request
+    description: Description of the marketing_request input
+    options:
+      position: bottom
+  marketing_response:
+    type: string
+    title: marketing_response
+    description: Description of the marketing_response input
+    options:
+      position: bottom
 acl:
   write: true == true
   read: true == true
-order: 11
+order: 18

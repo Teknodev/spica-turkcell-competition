@@ -152,4 +152,4 @@ acl:
 required:
   - user1
   - user2
-order: 9
+order: 16

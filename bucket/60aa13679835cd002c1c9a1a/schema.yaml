@@ -12,6 +12,7 @@ properties:
     description: Description of the msisdn input
     options:
       position: bottom
+      index: true
   reward:
     type: string
     title: reward
@@ -20,7 +21,7 @@ properties:
       position: bottom
     enum:
       - daily_1
-      - daily_2
+      - hourly_1
   created_at:
     type: date
     title: created_at
@@ -57,4 +58,4 @@ properties:
 acl:
   write: true==true
   read: true==true
-order: 14
+order: 21

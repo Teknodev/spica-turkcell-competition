@@ -1,0 +1,15 @@
+_id: 66fe77a4ff7403002c5fc84c
+name: New Turkcell User Flow
+language: javascript
+timeout: 60
+triggers:
+  default:
+    type: http
+    active: true
+    options:
+      method: Get
+      path: /
+      preflight: true
+env:
+  TCELL_ADMIN_BUCKET_INSERT_APIKEY: "{TCELL_ADMIN_BUCKET_INSERT_APIKEY}"
+memoryLimit: 100

@@ -22,3 +22,4 @@ triggers:
 env:
   API_KEY: "{API_KEY}"
   _IGNORE_: "{_IGNORE_}"
+order: 20

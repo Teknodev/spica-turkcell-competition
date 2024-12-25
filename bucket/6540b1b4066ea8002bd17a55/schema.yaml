@@ -1,0 +1,48 @@
+_id: 6540b1b4066ea8002bd17a55
+title: Pool Charge Report
+description: Describe your new bucket
+icon: receipt
+primary: game
+readOnly: false
+history: false
+properties:
+  date:
+    type: date
+    title: date
+    description: Description of the date input
+    options:
+      position: bottom
+  game:
+    type: string
+    title: game
+    description: Description of the game input
+    options:
+      position: bottom
+  channel:
+    type: string
+    title: channel
+    description: Description of the channel input
+    options:
+      position: bottom
+  quantity:
+    type: number
+    title: quantity
+    description: Description of the quantity input
+    options:
+      position: bottom
+  revenue:
+    type: number
+    title: revenue
+    description: Description of the revenue input
+    options:
+      position: bottom
+  charge_amount:
+    type: string
+    title: charge_amount
+    description: Description of the charge_amount input
+    options:
+      position: bottom
+acl:
+  write: true==true
+  read: true==true
+order: 42

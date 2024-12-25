@@ -23,15 +23,9 @@ triggers:
       frequency: "* * * * *"
     type: schedule
     active: true
-  manuallySendDrawFn:
-    options:
-      method: Get
-      path: /manuallySendDrawFn
-      preflight: true
-    type: http
-    active: true
 env:
   USER_BUCKET_ID: "{USER_BUCKET_ID}"
   NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
   CONFIRMATION_CODE_BUCKET_ID: "{CONFIRMATION_CODE_BUCKET_ID}"
 memoryLimit: 100
+order: 6

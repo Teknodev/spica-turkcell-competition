@@ -2,7 +2,7 @@ _id: 608942af11641f002cef9f31
 name: Report
 description: Report
 language: javascript
-timeout: 328.3
+timeout: 131
 triggers:
   executeReportDaily:
     options:
@@ -13,7 +13,7 @@ triggers:
   executeReportWeekly:
     options:
       timezone: Europe/Istanbul
-      frequency: 5 7 * * 1
+      frequency: 20 7 * * 1
     type: schedule
     active: true
   executeReportMonthly:
@@ -71,4 +71,6 @@ env:
   RETRY_REPORT_BUCKET_ID: "{RETRY_REPORT_BUCKET_ID}"
   REWARD_REPORT_BUCKET_ID: "{REWARD_REPORT_BUCKET_ID}"
   BUGGED_REWARD_BUCKET_ID: "{BUGGED_REWARD_BUCKET_ID}"
+  SINGLEPLAY_PAST_MATCHES: "{SINGLEPLAY_PAST_MATCHES}"
 memoryLimit: 100
+order: 13

@@ -1,5 +1,6 @@
 import * as Bucket from "@spica-devkit/bucket";
 import { database, close, ObjectId } from "@spica-devkit/database";
+import * as Identity from "@spica-devkit/identity";
 const jwt_decode = require("jwt-decode");
 var jwt = require("jsonwebtoken");
 
@@ -9,7 +10,6 @@ const OPTIONS_BUCKET_ID = process.env.OPTIONS_BUCKET_ID;
 const USER_BUCKET_ID = process.env.USER_BUCKET_ID;
 const PAST_DUELS_BUCKET_ID = process.env.PAST_DUELS_BUCKET_ID;
 
-const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 const SECRET_API_KEY = process.env.SECRET_API_KEY;
 const AFKCHECKER_API_KEY = process.env.AFKCHECKER_API_KEY;
 
@@ -45,7 +45,7 @@ export async function answerQuestion(req, res) {
     identityCollection = db.collection(`identity`);
 
     let duel = await duelsCollection.findById(duel_id).catch(err => console.log("ERROR 3", err));
-    let token_object = tokenVerified(token);
+    let token_object = await tokenVerified(token);
 
     if (token_object.error) {
         return res.status(401).send({ message: "Unauthorized" });
@@ -197,13 +197,14 @@ async function decreasePlayCount(duel, user) {
     if (duelAnswers.answersLength == 1) {
         if (user.bot == false) {
             let setQuery;
-            if (user.free_play) {
-                setQuery = { free_play: false };
-            } else {
+            // if (user.free_play) {
+            //     // setQuery = { free_play: false };
+            //     return; 
+            // } else {
                 setQuery = {
                     available_play_count: Math.max(Number(user.available_play_count) - 1, 0)
                 };
-            }
+            // }
 
             await usersCollection
                 .findOneAndUpdate(
@@ -296,7 +297,7 @@ async function isMatchFinished(duel) {
         if (duel.winner_of_current_question == 1) {
             if (!user1.bot) {
                 user1.win_count += 1;
-                user1EarnedAward += duel.user1_is_free ? 1 : 3;
+                user1EarnedAward += duel.user1_is_free ? 0 : 2;
                 user1EarnedPoints += 100;
                 user1.elo += 25;
             }
@@ -308,7 +309,7 @@ async function isMatchFinished(duel) {
         } else if (duel.winner_of_current_question == 2) {
             if (!user2.bot) {
                 user2.win_count += 1;
-                user2EarnedAward += duel.user2_is_free ? 1 : 3;
+                user2EarnedAward += duel.user2_is_free ? 0 : 2;
                 user2EarnedPoints += 100;
                 user2.elo += 25;
             }
@@ -612,21 +613,14 @@ function getToken(token) {
     return token;
 }
 
-function tokenVerified(token) {
+async function tokenVerified(token) {
     let response_object = {
         error: false
     };
-    let decoded = "";
 
-    if (token != AFKCHECKER_API_KEY) {
-        try {
-            decoded = jwt.verify(token, `${JWT_SECRET_KEY}`);
-
-            response_object.decoded_token = decoded;
-        } catch (err) {
-            response_object.error = true;
-        }
-    }
+    Identity.initialize({ apikey: `${SECRET_API_KEY}` });
+    const decoded = await Identity.verifyToken(token).catch(err => (response_object.error = true));
+    response_object.decoded_token = decoded;
 
     return response_object;
 }

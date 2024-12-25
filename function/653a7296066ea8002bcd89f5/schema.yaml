@@ -1,0 +1,31 @@
+_id: 653a7296066ea8002bcd89f5
+name: Marketing Services
+language: javascript
+timeout: 60
+triggers:
+  onInsertedMatch:
+    options:
+      collection: bucket_60742ed3f95e39002c4917ae
+      type: INSERT
+    type: database
+    active: true
+  onInsertedCharge:
+    options:
+      collection: bucket_60ab7235c03a2d002eb2f574
+      type: INSERT
+    type: database
+    active: true
+  sendKafkaDataManually:
+    options:
+      method: Get
+      path: /sendKafkaDataManually
+      preflight: true
+    type: http
+    active: true
+env:
+  USER_BUCKET: "{USER_BUCKET}"
+  NO_DEVKIT_DATABASE_WARNING: "{NO_DEVKIT_DATABASE_WARNING}"
+  PAST_MATCHES_BUCKET: "{PAST_MATCHES_BUCKET}"
+  CHARGE_LOGS_BUCKET: "{CHARGE_LOGS_BUCKET}"
+  SECRET_API_KEY: "{SECRET_API_KEY}"
+memoryLimit: 100

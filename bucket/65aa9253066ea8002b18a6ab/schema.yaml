@@ -1,0 +1,25 @@
+_id: 65aa9253066ea8002b18a6ab
+title: Charge Count Datas
+description: Describe your new bucket
+icon: view_stream
+primary: msisdn
+readOnly: false
+history: false
+properties:
+  msisdn:
+    type: string
+    title: msisdn
+    description: Description of the msisdn input
+    options:
+      position: bottom
+      index: true
+  charge_count:
+    type: number
+    title: charge_count
+    description: Description of the charge_count input
+    options:
+      position: bottom
+acl:
+  write: true==true
+  read: true==true
+order: 44
