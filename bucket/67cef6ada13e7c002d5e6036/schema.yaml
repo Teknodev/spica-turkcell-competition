@@ -1,0 +1,32 @@
+_id: 67cef6ada13e7c002d5e6036
+title: Three month unique player
+description: Describe your new bucket
+icon: view_stream
+primary: user_id
+readOnly: false
+history: false
+properties:
+  user_id:
+    type: string
+    title: user_id
+    description: Description of the user_id input
+    options:
+      position: bottom
+  msisdn:
+    type: string
+    title: msisdn
+    description: Description of the msisdn input
+    options:
+      position: bottom
+      index: true
+  is_played:
+    type: boolean
+    title: is_played
+    description: Description of the is_played input
+    options:
+      position: bottom
+    default: false
+acl:
+  write: true==true
+  read: true==true
+order: 48

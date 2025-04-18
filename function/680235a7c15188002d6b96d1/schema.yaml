@@ -1,0 +1,21 @@
+_id: 680235a7c15188002d6b96d1
+name: Auto Save Progress
+language: javascript
+timeout: 53.7
+triggers:
+  default:
+    type: http
+    active: true
+    options:
+      method: Get
+      path: /
+      preflight: true
+  saveProgress:
+    options:
+      method: Get
+      path: /saveProgress
+      preflight: true
+    type: http
+    active: true
+env: {}
+memoryLimit: 100
